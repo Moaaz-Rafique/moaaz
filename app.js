@@ -3,7 +3,7 @@ const projects = [
   {
     title: "Animated Torus",
     url: "https://brush-strokes.vercel.app/animatedTorus.html",
-    image: null,
+    image: "animatedTorus",
     description:
       "An animated torus that dynamically flips inside-out with controllable distortion, radius parameters, and influence meters.",
     seniority: 4,
@@ -21,7 +21,7 @@ const projects = [
   {
     title: "Ohana Development",
     url: "https://ohana-development-0.vercel.app/",
-    image: "screenshots/ohana_development.png",
+    image: "ohana_development",
     description:
       "Interactive storytelling microsite for a real estate brand. Uses 2d and 3d visuals, smooth scroll animations, and narrative-driven transitions.",
     seniority: 4,
@@ -36,31 +36,31 @@ const projects = [
     notes:
       "Already polished — adding scroll-based parallax or subtle 3D interactions would make it agency-grade.",
   },
-  {
-    title: "Custom UV Editor",
-    url: "https://custom-uv-editor.vercel.app/",
-    image: "screenshots/custom_uv_editor.png",
-    description:
-      "Advanced WebGL/Three.js demo for geometry and material workflows: custom UV projections, multi-channel UV mapping, video textures, synchronized cameras, instancing, mesh slicing, and CSG.",
-    seniority: 5,
-    relevance: 4,
-    portfolioReady: true,
-    tech: [
-      "Three.js",
-      "WebGL Buffers",
-      "Geometry Manipulation",
-      "Video Textures",
-      "Instancing",
-      "CSG",
-      "UV Mapping",
-    ],
-    notes:
-      "Strong technical demo. To maximize portfolio impact: add a user-friendly editor UI, show a practical application (e.g., product configurator), and highlight performance scalability.",
-  },
+  // {
+  //   title: "Custom UV Editor",
+  //   url: "https://custom-uv-editor.vercel.app/",
+  //   image: "screenshots/custom_uv_editor.png",
+  //   description:
+  //     "Advanced WebGL/Three.js demo for geometry and material workflows: custom UV projections, multi-channel UV mapping, video textures, synchronized cameras, instancing, mesh slicing, and CSG.",
+  //   seniority: 5,
+  //   relevance: 4,
+  //   portfolioReady: true,
+  //   tech: [
+  //     "Three.js",
+  //     "WebGL Buffers",
+  //     "Geometry Manipulation",
+  //     "Video Textures",
+  //     "Instancing",
+  //     "CSG",
+  //     "UV Mapping",
+  //   ],
+  //   notes:
+  //     "Strong technical demo. To maximize portfolio impact: add a user-friendly editor UI, show a practical application (e.g., product configurator), and highlight performance scalability.",
+  // },
   {
     title: "Worley Noise",
     url: "https://brush-strokes.vercel.app/worley3.html",
-    image: null,
+    image: 'worley3',
     description:
       "Interactive procedural Worley noise shader with vertex displacement and extensive material controls. Users can tweak PBR-like parameters (color, roughness, metalness, transmission, clearcoat, specular, opacity, etc.) alongside noise settings to explore both surface appearance and geometry deformation.",
     seniority: 4,
@@ -80,7 +80,7 @@ const projects = [
   {
     title: "Crowd Walking",
     url: "https://hologram-effect-threejs.vercel.app/walking.html",
-    image: null,
+    image: 'walking',
     description:
       "Simulation of multiple animated characters walking, exploring crowd dynamics and instancing efficiency.",
     seniority: 4,
@@ -93,7 +93,7 @@ const projects = [
   {
     title: "Clay Effect",
     url: "https://clay-effect.vercel.app/",
-    image: "screenshots/clay_effect.png",
+    image: "clay_effect",
     description:
       "Stylized clay shader applied to architectural geometry. AO shading.",
     seniority: 4,
@@ -111,7 +111,7 @@ const projects = [
   {
     title: "Sphere Depth",
     url: "https://brush-strokes.vercel.app/sphereDepth.html",
-    image: "screenshots/sphere_depth.png",
+    image: "sphere_depth",
     description:
       "Animated depth-shading experiment using postprocessing and custom depth shaders.",
     seniority: 4,
@@ -124,7 +124,7 @@ const projects = [
   {
     title: "Process Animation",
     url: "https://process-animation.vercel.app/",
-    image: "screenshots/process_animation.png",
+    image: "process_animation",
     description:
       "Fragment shader animations representing AI states such as idle, standby, listening, and processing.",
     seniority: 3,
@@ -138,7 +138,7 @@ const projects = [
   {
     title: "Fortune Teller",
     url: "https://fortune-teller-web.vercel.app/",
-    image: "screenshots/fortune_teller.png",
+    image: "fortune_teller",
     description:
       "A interactive WebGL fortune teller. Combines 3D interaction and visuals to deliver an engaging experience.",
     seniority: 3,
@@ -148,19 +148,19 @@ const projects = [
     notes:
       "Already strong — add atmospheric audio, smoother transitions, and polish visuals for a portfolio centerpiece.",
   },
-  {
-    title: "WebGL Animation Components",
-    url: "https://webgl-animation-components.vercel.app/",
-    image: null,
-    description:
-      "Library of reusable animation components for WebGL and Three.js, built for rapid prototyping of interactive effects.",
-    seniority: 3,
-    relevance: 3,
-    portfolioReady: false,
-    tech: ["Three.js", "Component Design", "Reusable Animations"],
-    notes:
-      "Showcase these powering a polished site or interactive demo — otherwise, it feels like background utility work rather than a highlight.",
-  },
+  // {
+  //   title: "WebGL Animation Components",
+  //   url: "https://webgl-animation-components.vercel.app/",
+  //   image: null,
+  //   description:
+  //     "Library of reusable animation components for WebGL and Three.js, built for rapid prototyping of interactive effects.",
+  //   seniority: 3,
+  //   relevance: 3,
+  //   portfolioReady: false,
+  //   tech: ["Three.js", "Component Design", "Reusable Animations"],
+  //   notes:
+  //     "Showcase these powering a polished site or interactive demo — otherwise, it feels like background utility work rather than a highlight.",
+  // },
 ];
 const container = document.getElementById("projectGrid");
 
@@ -174,7 +174,7 @@ projects.forEach((project) => {
   const preview =
     project.iframe && false
       ? `<iframe src="${project.url}"></iframe>`
-      : `<img src=${image} alt="${project.title}" />`;
+      : `<img src="/thumbnails/${project.image}.png" alt="${project.title}" />`;
 
   const techList = project.tech
     ? `<ul class="tech">${project.tech
