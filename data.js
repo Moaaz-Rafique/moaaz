@@ -161,3 +161,187 @@ const projects = [
       "Showcase these powering a polished site or interactive demo — otherwise, it feels like background utility work rather than a highlight.",
   },
 ];
+
+const skills = [
+  {
+    title: "Three.js",
+    relevance: 5,
+    seniority: 4,
+    notes:
+      "Core strength across shader experiments, microsites, and procedural graphics.",
+  },
+  {
+    title: "React Three Fiber (R3F)",
+    relevance: 5,
+    seniority: 4,
+    notes:
+      "Used in most portfolio projects; strong for modern production web graphics.",
+  },
+  {
+    title: "WebGL",
+    relevance: 5,
+    seniority: 4,
+    notes:
+      "Solid shader + rendering foundation. Builds credibility for low-level understanding.",
+  },
+  {
+    title: "OpenGL (C++)",
+    relevance: 3,
+    seniority: 4,
+    notes:
+      "Shows depth in GPU/graphics fundamentals, but less directly portfolio-relevant.",
+  },
+  {
+    title: "GLSL Shaders",
+    relevance: 5,
+    seniority: 4,
+    notes:
+      "Demonstrated in noise shaders, clay, depth, PBR labs — one of your strongest skills.",
+  },
+  {
+    title: "Vertex Displacement",
+    relevance: 5,
+    seniority: 4,
+    notes: "Highlighted in Worley noise and procedural material work.",
+  },
+  {
+    title: "Noise Functions (Perlin, Worley, procedural)",
+    relevance: 4,
+    seniority: 4,
+    notes: "Math-heavy shader and animation experiments.",
+  },
+  {
+    title: "Custom PBR Materials",
+    relevance: 4,
+    seniority: 4,
+    notes: "Shader/material lab work shows strong understanding.",
+  },
+  {
+    title: "Postprocessing Pipelines",
+    relevance: 4,
+    seniority: 3,
+    notes:
+      "Depth shaders, AO — next step is cinematic stacks (bloom, DOF, SSAO, motion blur).",
+  },
+  {
+    title: "Volumetric Rendering",
+    relevance: 3,
+    seniority: 2,
+    notes: "Covered godrays only — could expand into fog, smoke, clouds.",
+  },
+  {
+    title: "WebGPU",
+    relevance: 5,
+    seniority: 1,
+    notes: "Major missing piece; would future-proof your graphics skillset.",
+  },
+  {
+    title: "React",
+    relevance: 5,
+    seniority: 4,
+    notes: "Strongly demonstrated across most projects as the UI layer.",
+  },
+  {
+    title: "Next.js",
+    relevance: 5,
+    seniority: 4,
+    notes: "Your default production stack for web apps.",
+  },
+  {
+    title: "Tailwind CSS",
+    relevance: 5,
+    seniority: 4,
+    notes: "Polished UI integration for web graphics showcases.",
+  },
+  {
+    title: "State Management (Zustand/Redux)",
+    relevance: 4,
+    seniority: 3,
+    notes: "Useful for managing complex scene states; room to deepen usage.",
+  },
+  {
+    title: "Scroll-based Animation & Camera Pathing",
+    relevance: 5,
+    seniority: 4,
+    notes:
+      "Used in microsites like Ohana Development; already production-ready.",
+  },
+  {
+    title: "Interactive Uniform Controls",
+    relevance: 5,
+    seniority: 4,
+    notes: "Shader/material controls are well executed in your demos.",
+  },
+  {
+    title: "Instancing & Crowd Simulation",
+    relevance: 5,
+    seniority: 4,
+    notes: "Crowd walking demo shows efficiency and optimization skills.",
+  },
+  {
+    title: "Animation Mixer (Skeletal Animation)",
+    relevance: 4,
+    seniority: 4,
+    notes: "Shows competence with character animations.",
+  },
+  {
+    title: "Physics Engines (Rapier.js, Cannon.js, Ammo.js)",
+    relevance: 5,
+    seniority: 3,
+    notes:
+      "Covered in other contexts; expanding to fluids/cloth would strengthen.",
+  },
+  {
+    title: "GPU Compute / GPGPU",
+    relevance: 4,
+    seniority: 2,
+    notes:
+      "Particle system and basics only — full fluid/cloth sims would level this up.",
+  },
+  {
+    title: "GLTF/GLB Workflow",
+    relevance: 5,
+    seniority: 3,
+    notes: "Strong Blender → Web pipeline. Could highlight optimizations more.",
+  },
+  {
+    title: "Draco Compression",
+    relevance: 4,
+    seniority: 3,
+    notes: "Known skill; relevant for production optimization.",
+  },
+  {
+    title: "Texture Baking",
+    relevance: 4,
+    seniority: 3,
+    notes:
+      "Applied through Blender pipelines; could extend to full PBR pipelines.",
+  },
+  {
+    title: "Blender (Cycles, Eevee, Geometry Nodes, Grease Pencil)",
+    relevance: 4,
+    seniority: 4,
+    notes: "Wide coverage of creative and technical workflows.",
+  },
+  {
+    title: "Motion Graphics",
+    relevance: 3,
+    seniority: 3,
+    notes:
+      "Explored in Blender and shader animations — could tie more to web use cases.",
+  },
+  {
+    title: "Stylized Rendering (clay, toon)",
+    relevance: 3,
+    seniority: 3,
+    notes:
+      "Shader aesthetics demonstrated; expanding to characters could increase relevance.",
+  },
+  {
+    title: "Typography in 3D (TextGeometry, SDF text)",
+    relevance: 4,
+    seniority: 2,
+    notes:
+      "Missing in projects; adding examples would round out design/graphics crossover.",
+  },
+];
