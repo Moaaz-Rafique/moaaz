@@ -113,7 +113,6 @@ const projects = [
     notes:
       "Increase impact by tying animations directly to real user input (e.g., mic state, API responses) or presenting as part of an interactive UI system.",
   },
-
 ];
 const complimentaryProjects = [
   {
@@ -149,8 +148,8 @@ const complimentaryProjects = [
   {
     title: "Spline Study (Animated Cubes)",
     description:
-      "Explored spline motion and Perlin noise to animate a multi-level cube structure with dynamic scaling and reshaping.",
-    tech: ["Spline Math", "Perlin Noise", "3D Animation"],
+      "Explored spline.com to animate a multi-level cube structure with dynamic scaling and reshaping.",
+    tech: ["Spline", "Perlin Noise", "3D Animation"],
     relevanceScore: 3,
     seniorityScore: 3,
     notes:
@@ -256,7 +255,9 @@ function renderComplimentary(list, containerEl) {
     const card = document.createElement("div");
     card.className = "card complimentary-card";
 
-    const preview = `<img src="/thumbnails/fortune_teller.png" alt="${project.title}" />`;
+    const preview = project.image
+      ? `<img src="/thumbnails/${project.image}.png" alt="${project.title}" />`
+      : "";
 
     const techList = project.tech
       ? `<ul class="tech small">${project.tech
