@@ -10,15 +10,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@babylonjs/core": "^8.9.0",
-    "@babylonjs/gui": "^8.9.0",
-    "@babylonjs/loaders": "^8.9.0",
-    "@dimforge/rapier3d": "^0.16.2",
-    "@dimforge/rapier3d-compat": "^0.16.2",
-    "@leodeslf/worley-noise": "^1.1.2",
-    "camera-controls": "^2.10.1",
-    "fabric": "^5.3.0",
-    "three": "^0.173.0"
+    "three": "github:mrdoob/three.js#cadb42b1c3ac539d43a697a8471c9fde1b5600fa"
   },
   "devDependencies": {
     "@rollup/plugin-babel": "^6.0.4",
