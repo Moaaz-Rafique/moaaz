@@ -18,24 +18,24 @@ const projects = [
     notes:
       "Strong shader/geometry showcase — polish with camera transitions, a UI overlay explaining parameters, or apply the flipping effect to different models for broader impact.",
   },
-  {
-    title: "Ohana Development",
-    url: "https://ohana-development-0.vercel.app/",
-    image: "ohana_development",
-    description:
-      "Interactive storytelling microsite for a real estate brand. Uses 2d and 3d visuals, smooth scroll animations, and narrative-driven transitions.",
-    seniority: 4,
-    relevance: 5,
-    portfolioReady: true,
-    tech: [
-      "Three.js",
-      "Scroll-based animation",
-      "Camera pathing",
-      "GLSL shaders",
-    ],
-    notes:
-      "Already polished — adding scroll-based parallax or subtle 3D interactions would make it agency-grade.",
-  },
+  // {
+  //   title: "Ohana Development",
+  //   url: "https://ohana-development-0.vercel.app/",
+  //   image: "ohana_development",
+  //   description:
+  //     "Interactive storytelling microsite for a real estate brand. Uses 2d and 3d visuals, smooth scroll animations, and narrative-driven transitions.",
+  //   seniority: 4,
+  //   relevance: 5,
+  //   portfolioReady: true,
+  //   tech: [
+  //     "Three.js",
+  //     "Scroll-based animation",
+  //     "Camera pathing",
+  //     "GLSL shaders",
+  //   ],
+  //   notes:
+  //     "Already polished — adding scroll-based parallax or subtle 3D interactions would make it agency-grade.",
+  // },
   {
     title: "Worley Noise",
     url: "https://brush-strokes.vercel.app/worley3.html",
