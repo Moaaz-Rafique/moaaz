@@ -113,6 +113,19 @@ const projects = [
     notes:
       "Increase impact by tying animations directly to real user input (e.g., mic state, API responses) or presenting as part of an interactive UI system.",
   },
+  {
+    title: "Tron Track Visualization",
+    url: "https://tron-racer-git-all-trails-soct.vercel.app/",
+    image: "tron_racer",
+    description:
+      "A visualization for a tron racer game with different trails using fragment shaders ",
+    seniority: 3,
+    relevance: 3,
+    portfolioReady: true,
+    tech: ["GLSL shaders", "Fragment Shaders", "UI Feedback"],
+    notes:
+      "",
+  },
 ];
 const complimentaryProjects = [
   {
