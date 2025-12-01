@@ -38,7 +38,7 @@ const projects = [
   },
   {
     title: "Worley Noise",
-    url: "worley3.html",
+    url: "https://brush-strokes.vercel.app/worley3.html",
     image: "worley3",
     description:
       "Interactive procedural Worley noise shader with vertex displacement and extensive material controls. Users can tweak PBR-like parameters (color, roughness, metalness, transmission, clearcoat, specular, opacity, etc.) alongside noise settings to explore both surface appearance and geometry deformation.",
