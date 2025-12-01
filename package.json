@@ -10,6 +10,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "gsap": "^3.13.0",
     "pixi-filters": "^6.1.4",
     "pixi.js": "^8.14.0",
     "three": "github:mrdoob/three.js#cadb42b1c3ac539d43a697a8471c9fde1b5600fa"

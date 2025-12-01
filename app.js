@@ -18,27 +18,27 @@ const projects = [
     notes:
       "Strong shader/geometry showcase — polish with camera transitions, a UI overlay explaining parameters, or apply the flipping effect to different models for broader impact.",
   },
-  // {
-  //   title: "Ohana Development",
-  //   url: "https://ohana-development-0.vercel.app/",
-  //   image: "ohana_development",
-  //   description:
-  //     "Interactive storytelling microsite for a real estate brand. Uses 2d and 3d visuals, smooth scroll animations, and narrative-driven transitions.",
-  //   seniority: 4,
-  //   relevance: 5,
-  //   portfolioReady: true,
-  //   tech: [
-  //     "Three.js",
-  //     "Scroll-based animation",
-  //     "Camera pathing",
-  //     "GLSL shaders",
-  //   ],
-  //   notes:
-  //     "Already polished — adding scroll-based parallax or subtle 3D interactions would make it agency-grade.",
-  // },
+  {
+    title: "Ohana Development",
+    url: "https://ohana-development-0.vercel.app/",
+    image: "ohana_development",
+    description:
+      "Interactive website for a real estate brand. Uses 2d and 3d visuals, and smooth scroll animations.",
+    seniority: 4,
+    relevance: 5,
+    portfolioReady: true,
+    tech: [
+      "Three.js",
+      "Scroll-based animation",
+      "Camera pathing",
+      "GLSL shaders",
+    ],
+    notes:
+      "Already polished — adding scroll-based parallax or subtle 3D interactions would make it agency-grade.",
+  },
   {
     title: "Worley Noise",
-    url: "https://brush-strokes.vercel.app/worley3.html",
+    url: "worley3.html",
     image: "worley3",
     description:
       "Interactive procedural Worley noise shader with vertex displacement and extensive material controls. Users can tweak PBR-like parameters (color, roughness, metalness, transmission, clearcoat, specular, opacity, etc.) alongside noise settings to explore both surface appearance and geometry deformation.",
@@ -57,35 +57,26 @@ const projects = [
       "Now this is more than a noise demo — it’s effectively a mini shader/material lab. To boost portfolio impact: package it as a 'Procedural Material Explorer' with presets (e.g., glass, clay, metal) and export options (textures or materials).",
   },
   {
-    title: "Crowd Walking",
-    url: "https://hologram-effect-threejs.vercel.app/walking.html",
-    image: "walking",
+    title: "Basic TSL Transitions and Scroll Animations",
+    url: "./scroll-and-tsl-transitions.html",
+    image: "scroll_tsl_transition",
     description:
-      "Simulation of multiple animated characters walking, exploring crowd dynamics and instancing efficiency.",
+      "Three.js post-processing demo using TSL nodes. Implements dynamic transitions between Sobel and DotScreen effects with noise-driven variations.",
     seniority: 4,
-    relevance: 4,
-    portfolioReady: true,
-    tech: ["Three.js", "Animation Mixer", "Instancing", "Crowd Simulation"],
-    notes:
-      "Add flocking/AI behavior or link it to architectural/entertainment contexts to elevate it as a case study.",
-  },
-  {
-    title: "Clay Effect",
-    url: "https://clay-effect.vercel.app/",
-    image: "clay_effect",
-    description:
-      "Stylized clay shader applied to architectural geometry. AO shading.",
-    seniority: 4,
-    relevance: 3,
+    relevance: 5,
     portfolioReady: true,
     tech: [
       "Three.js",
-      "GLSL shaders",
-      "Custom Material",
-      "AO-inspired shading",
+      "WebGPU",
+      "TSL nodes",
+      "Post-processing",
+      "Procedural noise",
+      "Shader transitions",
+      "GSAP animations",
+      "Interactive scroll",
     ],
     notes:
-      "Enhance relevance by applying it to characters or animating the architecture to showcase the shader in motion.",
+      "The project demonstrates both shader logic (TSL transitions, noise blending) and interactive scene control (scroll-based section switching, camera parallax, particle system). To enhance portfolio value, consider adding presets for different transition styles, and optionally expose uniforms for live tweaking in a GUI.",
   },
   {
     title: "Sphere Depth",
@@ -123,8 +114,60 @@ const projects = [
     relevance: 3,
     portfolioReady: true,
     tech: ["GLSL shaders", "Fragment Shaders", "UI Feedback"],
+    notes: "",
+  },
+  {
+    title: "TSL SSGI Scene",
+    url: "./testingssgi.html",
+    image: "ssgi",
+    description:
+      "Advanced Three.js WebGPU demo showcasing TSL-based post-processing pipelines. Implements screen-space global illumination (SSGI) with interactive controls. Users can manipulate lights, objects, and scene parameters while observing real-time GI, AO, and composite outputs via inspector GUI.",
+    seniority: 5,
+    relevance: 5,
+    portfolioReady: true,
+    tech: [
+      "Three.js",
+      "WebGPU",
+      "TSL nodes",
+      "SSGI (Screen-space Global Illumination)",
+      "TRAA (Temporal Anti-Aliasing)",
+      "Shader post-processing",
+      "Interactive inspector GUI",
+      "Dynamic scene lighting",
+    ],
     notes:
-      "",
+      "This project demonstrates advanced real-time rendering techniques and interactive scene manipulation. For portfolio impact: highlight the SSGI and TRAA effects, show inspector-based tweaking, and optionally include preset camera views or lighting scenarios for storytelling purposes.",
+  },
+  {
+    title: "Clay Effect",
+    url: "https://clay-effect.vercel.app/",
+    image: "clay_effect",
+    description:
+      "Stylized clay shader applied to architectural geometry. AO shading.",
+    seniority: 4,
+    relevance: 3,
+    portfolioReady: true,
+    tech: [
+      "Three.js",
+      "GLSL shaders",
+      "Custom Material",
+      "AO-inspired shading",
+    ],
+    notes:
+      "Enhance relevance by applying it to characters or animating the architecture to showcase the shader in motion.",
+  },
+  {
+    title: "Crowd Walking",
+    url: "https://hologram-effect-threejs.vercel.app/walking.html",
+    image: "walking",
+    description:
+      "Simulation of multiple animated characters walking, exploring crowd dynamics and instancing efficiency.",
+    seniority: 4,
+    relevance: 4,
+    portfolioReady: true,
+    tech: ["Three.js", "Animation Mixer", "Instancing", "Crowd Simulation"],
+    notes:
+      "Add flocking/AI behavior or link it to architectural/entertainment contexts to elevate it as a case study.",
   },
 ];
 const complimentaryProjects = [
@@ -285,8 +328,6 @@ function renderComplimentary(list, containerEl) {
         <h3>${project.title}</h3>
         <p class="description small">${project.description}</p>
         ${techList}
-        
-        
       </div>
     `;
 
