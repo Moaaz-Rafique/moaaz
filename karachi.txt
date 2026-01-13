@@ -1,0 +1,297 @@
+---------------
+game activities
+---------------
+investigation
+    lost items
+    history
+    stories
+    truth
+    missing people
+    underground groups
+    paranormal rumors
+    urban legends
+    mysterious locations
+
+quests
+    pictures for landscape, area, clothes and shops
+    languages
+    cultures
+    festivals/celebrations/events
+    music
+    public transport routes
+    architectural landmarks
+    street food tasting
+    neighborhood documentation
+
+delivery for money
+    food
+    clothes
+    medicines
+    documents
+    electronics
+    parcels
+    urgent home services
+    lab samples
+
+shopping
+    clothes
+    groceries
+    repairs
+    accessories
+    electronics
+    street food
+    furniture
+    books
+    plants
+
+charity
+    cleaning
+    food and cloth distribution
+    basic medical assistance
+    operate food banks
+    blood donation
+    fundraising events
+    teaching kids
+    disaster relief
+    rescue stray animals
+
+sports
+    exercise in gyms and parks
+    cricket
+    football
+    swimming
+    boxing
+    basketball
+    badminton
+    running tracks
+    indoor gaming zones
+
+skills
+    photography
+    driving
+    interviews
+    cooking
+    repairing electronics
+    bargaining
+    navigation
+    public speaking
+
+friendship & groups
+    meet friends in parks, cafes, beaches
+    group sports and tournaments
+    chai dhaba hangouts
+    late-night food trips
+    group shopping in markets and malls
+    photography walks
+    gaming zones with friends
+    study groups
+    helping friends with deliveries
+    helping friends move houses
+    group visits to historical places
+    attending festivals and events together
+    volunteering together in charity drives
+    optional group tasks with bonus rewards
+    friendship levels unlock special group abilities
+----------
+challenges 
+----------
+environment & city
+    heatwaves
+    power outages
+    water shortages
+    floods from rain
+    pollution
+    trash
+    seasonal diseases
+
+traffic & movement
+    traffic
+    potholes
+    accidents
+    road blockages for events
+    VIP movement
+    truck accidents
+    checkpoints
+    overcrowded buses
+
+security & social
+    riots
+    protests
+    petty theft
+    scams
+    aggressive drivers
+    stray animals causing delays
+--------
+gameplay
+--------
+wake up
+    check phone
+    daily objectives
+    quests / deliveries / friend plans
+    city news & challenges (heatwave, floods, outages)
+
+prepare for the day
+    eat breakfast
+    equip skills (camera, bike, tools)
+    select outfit (affects mood, reactions)
+
+choose your path for the day
+    investigation missions
+    deliveries for money
+    shopping errands
+    sports & exercise
+    charity activities
+    group hangouts / friend tasks
+
+travel to the destination
+    select travel mode (walk / bus / bike / rickshaw / taxi)
+    traffic and road conditions affect time
+    random events (checkpoints, blockages, scams, accidents)
+    energy, mood, and heat management
+
+perform the activity
+    complete quest goals
+    collect items / take photos / deliver goods
+    talk to NPCs / learn stories
+    play mini-games (bargaining, sports, repairs)
+    manage reputation, skill XP, friend level bonuses
+
+handle dynamic challenges
+    weather shift (rain → floods)
+    riots or protests nearby
+    power outage disabling some shops
+    potholes or broken roads
+    petty theft attempt
+    accident blocking route
+    late-night safety risks
+
+optional group interactions
+    join friends for food or shopping
+    group sports events
+    study or photography walks
+    help friends with missions
+    unlock small bonuses from group trust level
+
+return home
+    evening traffic → slower travel
+    buy dinner / groceries
+    small events on the way (talk to vendors, street music)
+
+end-of-day summary
+    money earned
+    skills gained
+    friendship progress
+    reputation changes
+    city events tomorrow announced
+
+sleep
+    save progress
+    new day starts with new conditions and challenges
+
+
+GAME DESIGN DOCUMENT (GDD SECTION)
+Title: Daily Life Loop – Metropolitan City Sandbox
+1.0 OVERVIEW
+
+This document defines the daily gameplay loop, time structure, and activity flow for a 2D lifestyle simulation game set in a dense metropolitan city similar to Karachi.
+The system requires the player to perform three meaningful activities per day across different city areas, while managing travel, challenges, time pressure, and social interactions.
+
+2.0 CORE LOOP SUMMARY
+
+Wake up → Plan → Travel → Activity 1 → Travel → Activity 2 → Travel → Activity 3 → Return home → Summary → Sleep → New Day
+
+The loop is driven by:
+
+time-of-day progression
+
+city-wide dynamic challenges
+
+player planning and decision-making
+
+optional friend and group interactions
+
+energy, hunger, and mood management
+
+area-based exploration and reputation building
+
+3.0 TIME-OF-DAY SYSTEM
+
+The game day is divided into four major time blocks:
+
+3.1 Morning (6am–12pm)
+
+low traffic, lower danger
+
+bonus for investigation, photography, charity
+
+early deliveries (schools, offices)
+
+lower heat
+
+Morning Events
+
+vendors opening
+
+buses less crowded
+
+street cleaners active
+
+3.2 Afternoon (12pm–5pm)
+
+highest heat and energy drain
+
+peak traffic
+
+ideal for shopping and market deliveries
+
+more scams, pickpockets, dense crowds
+
+Afternoon Events
+
+VIP movement risk
+
+rickshaw surge pricing
+
+road blockages
+
+rain → flooding risk
+
+3.3 Evening (5pm–12am)
+
+social peak time
+
+friend hangouts
+
+festivals, night markets
+
+sports leagues (night cricket, football grounds)
+
+photography bonus (golden hour)
+
+Evening Events
+
+light-to-heavy traffic
+
+accidents increase
+
+shops closing deadlines
+
+3.4 Night (12am–6am)
+
+low visibility
+
+higher danger
+
+optional late errands
+
+police checkpoints
+
+stray animals active
+
+Night Events
+
+robberies or muggings
+
+reduced public transport
+
+smog increases

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weekly Timetable</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+        font-size: 14px;
+      }
+      th {
+        background: #222;
+        color: #fff;
+      }
+
+      /* Color coding */
+      .client {
+        background: #cfe2ff;
+      } /* Light blue */
+      .business {
+        background: #d1e7dd;
+      } /* Light green */
+      .rnd {
+        background: #e2d5f5;
+      } /* Light purple */
+      .exercise {
+        background: #ffe5cc;
+      } /* Light orange */
+      .breaks {
+        background: #fff3cd;
+      } /* Light yellow */
+      .prayer {
+        background: #f8d7da;
+      } /* Light red/pink */
+      .personal {
+        background: #e8d3c2;
+      } /* Light brown */
+      .sleep {
+        background: #e0e0e0;
+      } /* Grey */
+    </style>
+  </head>
+  <body>
+    <h1>Weekly Timetable</h1>
+
+    <table>
+      <tr>
+        <th>Day</th>
+        <th>6:00–9:00</th>
+        <th>9:00–12:00</th>
+        <th>12:00–15:00</th>
+        <th>15:00–18:00</th>
+        <th>18:00–21:30</th>
+        <th>21:30–06:00</th>
+      </tr>
+
+      <!-- Monday -->
+      <tr>
+        <td><strong>Monday</strong></td>
+        <td class="prayer">Fajr+Breakfast+Light activity</td>
+        <td class="client">Client Work</td>
+        <td class="prayer">
+          Dhuhr →<br /><span class="breaks">Lunch + Break</span>
+        </td>
+        <td class="client">
+          Client Work →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="exercise">Exercise</td>
+        <td class="sleep">Sleep</td>
+      </tr>
+
+      <!-- Tuesday -->
+      <tr>
+        <td><strong>Tuesday</strong></td>
+        <td class="prayer">
+         Fajr+Breakfast+Light activity
+        </td>
+        <td class="client">Client Work</td>
+        <td class="prayer">Dhuhr →<br /><span class="breaks">Lunch</span></td>
+        <td class="rnd">
+          R&D / Learning →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="personal">Family / Social Time</td>
+        <td class="sleep">Sleep</td>
+      </tr>
+
+      <!-- Wednesday -->
+      <tr>
+        <td><strong>Wednesday</strong></td>
+        <td class="prayer">Fajr+Breakfast+Light activity</td>
+        <td class="client">Client Work</td>
+        <td class="prayer">Dhuhr →<br /><span class="breaks">Lunch</span></td>
+        <td class="client">
+          Client Revisions →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="personal">Errands / Relatives</td>
+        <td class="sleep">Sleep</td>
+      </tr>
+
+      <!-- Thursday -->
+      <tr>
+        <td><strong>Thursday</strong></td>
+        <td class="prayer">Fajr+Breakfast+Light activity</td>
+        <td class="client">Client Work</td>
+        <td class="prayer">
+          Dhuhr →<br /><span class="business">Portfolio / Outreach</span>
+        </td>
+        <td class="business">
+          Marketing / Leads →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="exercise">
+          Gym →<br /><span class="personal">Family</span>
+        </td>
+        <td class="sleep">Sleep</td>
+      </tr>
+
+      <!-- Friday -->
+      <tr>
+        <td><strong>Friday</strong></td>
+        <td class="prayer">Fajr+Breakfast+Light activity
+        <td class="client">Client Wrap-ups</td>
+        <td class="prayer">
+          Dhuhr (Jummah) →<br /><span class="breaks">Lunch</span>
+        </td>
+        <td class="rnd">
+          Creative Coding →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="personal">Friends / Chai Night</td>
+        <td class="sleep">Sleep</td>
+      </tr>
+
+      <!-- Saturday -->
+      <tr>
+        <td><strong>Saturday</strong></td>
+        <td class="prayer">Fajr+Breakfast+Light activity</td>
+        <td class="business">Optional Side Projects</td>
+        <td class="prayer">
+          Dhuhr →<br /><span class="personal">Outings</span>
+        </td>
+        <td class="personal">
+          Social / Hobbies →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="personal">Free Evening</td>
+        <td class="sleep">Sleep</td>
+      </tr>
+
+      <!-- Sunday -->
+      <tr>
+        <td><strong>Sunday</strong></td>
+        <td class="prayer">
+          Fajr+Breakfast+Light activity
+        </td>
+        <td class="personal">Family Time</td>
+        <td class="prayer">Dhuhr →<br /><span class="breaks">Lunch</span></td>
+        <td class="personal">
+          Hobbies / Rest →<br /><span class="prayer">Asr</span>
+        </td>
+        <td class="personal">Weekly Planning</td>
+        <td class="sleep">Sleep</td>
+      </tr>
+    </table>
+  </body>
+</html>
