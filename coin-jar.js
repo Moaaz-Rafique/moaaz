@@ -1,16 +1,17 @@
 import * as THREE from "three";
 import * as RAPIER from "@dimforge/rapier3d-compat";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
+import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { RapierDebugRenderer } from "./DebugRenderer";
+import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader";
 
 await RAPIER.init();
 
 /* -------------------------------------------------- */
 /* Constants                                          */
 /* -------------------------------------------------- */
-const MAX_COINS = 10_000;
-const FREEZE_TIME = 20_000; // ms
-const FREEZE_HEIGHT = 1.0;
+const MAX_COINS = 2_100;
+const FREEZE_TIME = 100_000; // ms
+let FREEZE_HEIGHT = 0.1;
 
 /* -------------------------------------------------- */
 /* Scene setup                                        */
@@ -24,8 +25,9 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(6, 8, 10);
-camera.lookAt(0, 2, 0);
+const cy = 5;
+camera.position.set(20, cy, 0);
+camera.lookAt(0, cy, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -37,6 +39,13 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
 dirLight.position.set(5, 10, 5);
 scene.add(dirLight);
+const rgbeLoader = new HDRLoader();
+
+rgbeLoader.load("/textures/base.hdr", function (texture) {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  scene.environment = texture;
+  // scene.background = texture;
+});
 
 /* -------------------------------------------------- */
 /* Rapier world (tuned)                               */
@@ -46,7 +55,7 @@ const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
 world.integrationParameters.allowedLinearError = 0.01;
 world.integrationParameters.allowedAngularError = 0.01;
 world.integrationParameters.numSolverIterations = 4;
-world.integrationParameters.numInternalPgsIterations = 1;
+world.integrationParameters.numInternalPgsIterations = 2;
 
 /* -------------------------------------------------- */
 /* Debug renderer                                     */
@@ -60,68 +69,55 @@ document.getElementById("debugToggle").addEventListener("change", (e) => {
 /* -------------------------------------------------- */
 /* Ground                                             */
 /* -------------------------------------------------- */
-{
-  const body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
-  world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.1, 20), body);
+// {
+//   const body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
+//   world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.1, 20), body);
 
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(40, 0.2, 40),
-    new THREE.MeshStandardMaterial({ color: 0x333333 })
-  );
-  mesh.position.y = -0.1;
-  scene.add(mesh);
-}
+//   const mesh = new THREE.Mesh(
+//     new THREE.BoxGeometry(40, 0.2, 40),
+//     new THREE.MeshStandardMaterial({ color: 0x333333 })
+//   );
+//   mesh.position.y = -0.1;
+//   scene.add(mesh);
+// }
 
 /* -------------------------------------------------- */
 /* Pot (compound collider)                            */
 /* -------------------------------------------------- */
+const loader = new GLTFLoader();
+
 function createPot() {
-  const potBody = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
+  const url = "/models/pot1.glb";
 
-  const height = 5;
-  const radius = 5;
-  const wallThickness = 0.15;
-  const wallCount = 36;
+  loader.load(url, (gltf) => {
+    const potMesh = gltf.scene;
+    potMesh.position.y = 4;
+    potMesh.scale.multiplyScalar(2);
+    // scene.add(potMesh);
 
-  // Bottom
-  world.createCollider(
-    RAPIER.ColliderDesc.cylinder(0.1, radius)
-      .setTranslation(0, 0.1, 0)
-      .setFriction(1.0),
-    potBody
-  );
+    potMesh.updateWorldMatrix(true, true);
 
-  // Walls
-  for (let i = 0; i < wallCount; i++) {
-    const angle = (i / wallCount) * Math.PI * 2;
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius;
+    const body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
 
-    world.createCollider(
-      RAPIER.ColliderDesc.cuboid(wallThickness, height / 2, 0.5)
-        .setTranslation(x, height / 2, z)
-        .setRotation({
-          x: 0,
-          y: -Math.sin(angle / 2),
-          z: 0,
-          w: Math.cos(angle / 2),
-        })
-        .setFriction(1.0),
-      potBody
-    );
-  }
+    potMesh.traverse((child) => {
+      if (!child.isMesh) return;
 
-  const mesh = new THREE.Mesh(
-    new THREE.CylinderGeometry(radius, radius, height, 32, 1, true),
-    new THREE.MeshStandardMaterial({
-      color: 0x996633,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.1,
-    })
-  );
-  mesh.position.y = height / 2;
-  scene.add(mesh);
+      const geom = child.geometry.clone();
+      geom.applyMatrix4(child.matrixWorld);
+
+      const positions = geom.attributes.position.array;
+      const indices = geom.index
+        ? geom.index.array
+        : [...Array(positions.length / 3).keys()];
+
+      const colliderDesc = RAPIER.ColliderDesc.trimesh(
+        positions,
+        indices
+      ).setFriction(0.0);
+
+      world.createCollider(colliderDesc, body);
+    });
+  });
 }
 
 createPot();
@@ -129,13 +125,27 @@ createPot();
 /* -------------------------------------------------- */
 /* Instanced coins                                    */
 /* -------------------------------------------------- */
-const coinGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.08, 24);
-const coinMaterial = new THREE.MeshStandardMaterial({ color: 0xffcc33 });
+let coinMesh = null;
 
-const coinMesh = new THREE.InstancedMesh(coinGeometry, coinMaterial, MAX_COINS);
-coinMesh.castShadow = false;
-coinMesh.receiveShadow = false;
-scene.add(coinMesh);
+loader.load("/models/coin_compressed2.glb", (gltf) => {
+  let sourceMesh = null;
+
+  gltf.scene.traverse((o) => {
+    if (o.isMesh && !sourceMesh) sourceMesh = o;
+  });
+
+  if (!sourceMesh) return;
+
+  const geometry = sourceMesh.geometry.clone();
+  const material = sourceMesh.material.clone();
+
+  coinMesh = new THREE.InstancedMesh(geometry, material, MAX_COINS);
+
+  // coinMesh.castShadow = false;
+  // coinMesh.receiveShadow = false;
+
+  scene.add(coinMesh);
+});
 
 /* -------------------------------------------------- */
 /* Coin storage                                       */
@@ -165,14 +175,18 @@ function spawnCoin(y) {
 
   const body = world.createRigidBody(
     RAPIER.RigidBodyDesc.dynamic()
-      .setTranslation((Math.random() - 0.5) * 3, y, (Math.random() - 0.5) * 3)
+      .setTranslation(
+        (Math.random() - 0.5) * 2,
+        y + 2 * (Math.random() - 0.5),
+        (Math.random() - 0.5) * 2
+      )
       .setRotation(quat)
       //   .setLinearDamping(0.7)
       .setAngularDamping(0.9)
   );
 
   world.createCollider(
-    RAPIER.ColliderDesc.cylinder(0.04, 0.4)
+    RAPIER.ColliderDesc.cylinder(0.045, 0.45)
       .setDensity(1.0)
       .setFriction(0.6)
       .setRestitution(0.05),
@@ -210,7 +224,7 @@ function freezeCoinAsStatic(c) {
 
   // Attach collider with translation & rotation baked in
   world.createCollider(
-    RAPIER.ColliderDesc.cylinder(0.04, 0.4)
+    RAPIER.ColliderDesc.cylinder(0.041, 0.41)
       .setTranslation(x, y, z)
       .setRotation({ x: rx, y: ry, z: rz, w }),
     staticBody
@@ -242,6 +256,10 @@ function freezeCoin(c) {
 let spawnTimer = 0;
 
 function animate() {
+  if (!coinMesh) {
+    requestAnimationFrame(animate);
+    return;
+  }
   requestAnimationFrame(animate);
   world.step();
 
@@ -249,7 +267,12 @@ function animate() {
 
   // Spawn coins
   spawnTimer++;
-  if (spawnTimer % 2 === 0) spawnCoin(10);
+  if (spawnTimer % 1 === 0) {
+    for (let i = 0; i < 2; i++) {
+      spawnCoin(10);
+    }
+    FREEZE_HEIGHT = coinMesh.count / 300;
+  }
 
   // Physics → freeze logic
   for (const c of coins) {
@@ -260,9 +283,9 @@ function animate() {
     const elapsed = now - c.spawnTime;
 
     const slow =
-      Math.abs(v.x) < 0.05 && Math.abs(v.y) < 0.05 && Math.abs(v.z) < 0.05;
+      Math.abs(v.x) < 0.1 && Math.abs(v.y) < 0.1 && Math.abs(v.z) < 0.1;
 
-    const settled = p.y < FREEZE_HEIGHT && slow && c.body.isSleeping();
+    const settled = (p.y < FREEZE_HEIGHT && slow) || c.body.isSleeping();
 
     if (elapsed > FREEZE_TIME || settled) {
       freezeCoin(c);
