@@ -60,7 +60,7 @@ world.integrationParameters.numInternalPgsIterations = 2;
 /* -------------------------------------------------- */
 /* Debug renderer                                     */
 /* -------------------------------------------------- */
-let showDebug = true;
+let showDebug = false;
 const rapierDebugRender = new RapierDebugRenderer(scene, world, showDebug);
 document.getElementById("debugToggle").addEventListener("change", (e) => {
   showDebug = e.target.checked;
@@ -91,7 +91,7 @@ loader.load("/images/Jar back.png", (texture) => {
   // Optional: scale to match texture aspect ratio
   const aspect = texture.image.width / texture.image.height;
   mesh.scale.set(aspect, 1, 1);
-  mesh.scale.multiplyScalar(10.5);
+  mesh.scale.multiplyScalar(10.25);
   mesh.rotation.y = Math.PI / 2;
   // Add to scene
   scene.add(mesh);
@@ -111,7 +111,7 @@ loader.load("/images/Jar front.png", (texture) => {
   const mesh = new THREE.Mesh(geometry, material);
 
   // Set position
-  mesh.position.set(5, 4.125, 0); // x, y, z
+  mesh.position.set(5, 4.2, 0); // x, y, z
   // Optional: scale to match texture aspect ratio
   const aspect = texture.image.width / texture.image.height;
   mesh.scale.set(aspect, 1, 1);
@@ -237,6 +237,8 @@ function spawnCoin(y) {
     },
     true,
   );
+  body.enableCcd(true)
+  
 
   coins.push({
     body,
