@@ -9,7 +9,7 @@ await RAPIER.init();
 /* -------------------------------------------------- */
 /* Constants                                          */
 /* -------------------------------------------------- */
-const MAX_COINS = 2_100;
+const MAX_COINS = 2_000;
 const FREEZE_TIME = 100_000; // ms
 let FREEZE_HEIGHT = 0.1;
 
@@ -20,12 +20,12 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x111111);
 
 const camera = new THREE.PerspectiveCamera(
-  60,
+  30,
   window.innerWidth / window.innerHeight,
   0.1,
   100
 );
-const cy = 5;
+const cy = 4.5;
 camera.position.set(20, cy, 0);
 camera.lookAt(0, cy, 0);
 
@@ -33,7 +33,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const orbit = new OrbitControls(camera, renderer.domElement);
+// const orbit = new OrbitControls(camera, renderer.domElement);
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -66,6 +66,7 @@ document.getElementById("debugToggle").addEventListener("change", (e) => {
   showDebug = e.target.checked;
   rapierDebugRender.toggleVisible(showDebug);
 });
+const coinCount = document.getElementById("coinCount");
 /* -------------------------------------------------- */
 /* Ground                                             */
 /* -------------------------------------------------- */
@@ -87,7 +88,7 @@ document.getElementById("debugToggle").addEventListener("change", (e) => {
 const loader = new GLTFLoader();
 
 function createPot() {
-  const url = "/models/pot1.glb";
+  const url = "/models/pot2.glb";
 
   loader.load(url, (gltf) => {
     const potMesh = gltf.scene;
@@ -166,7 +167,7 @@ const tempScale = new THREE.Vector3(1, 1, 1);
 function spawnCoin(y) {
   if (coinIndex >= MAX_COINS) return;
   coinMesh.count = coinIndex + 1; // increase only when spawning
-
+  coinCount.innerHTML = coinMesh.count;
   const axis = tempPos
     .set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
     .normalize();
@@ -176,13 +177,13 @@ function spawnCoin(y) {
   const body = world.createRigidBody(
     RAPIER.RigidBodyDesc.dynamic()
       .setTranslation(
-        (Math.random() - 0.5) * 2,
-        y + 2 * (Math.random() - 0.5),
-        (Math.random() - 0.5) * 2
+        (Math.random() - 0.5) * 1,
+        y + 1 * Math.random(),
+        (Math.random() - 0.5) * 1
       )
       .setRotation(quat)
-      //   .setLinearDamping(0.7)
-      .setAngularDamping(0.9)
+      .setLinearDamping(0.7)
+      .setAngularDamping(0.2)
   );
 
   world.createCollider(
@@ -267,9 +268,9 @@ function animate() {
 
   // Spawn coins
   spawnTimer++;
-  if (spawnTimer % 1 === 0) {
-    for (let i = 0; i < 2; i++) {
-      spawnCoin(10);
+  if (spawnTimer % 5 === 0) {
+    for (let i = 0; i < 1; i++) {
+      spawnCoin(15);
     }
     FREEZE_HEIGHT = coinMesh.count / 300;
   }
