@@ -23,7 +23,7 @@ const camera = new THREE.PerspectiveCamera(
   30,
   window.innerWidth / window.innerHeight,
   0.1,
-  100
+  1000,
 );
 const cy = 4.5;
 camera.position.set(20, cy, 0);
@@ -67,30 +67,64 @@ document.getElementById("debugToggle").addEventListener("change", (e) => {
   rapierDebugRender.toggleVisible(showDebug);
 });
 const coinCount = document.getElementById("coinCount");
-/* -------------------------------------------------- */
-/* Ground                                             */
-/* -------------------------------------------------- */
-// {
-//   const body = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
-//   world.createCollider(RAPIER.ColliderDesc.cuboid(20, 0.1, 20), body);
 
-//   const mesh = new THREE.Mesh(
-//     new THREE.BoxGeometry(40, 0.2, 40),
-//     new THREE.MeshStandardMaterial({ color: 0x333333 })
-//   );
-//   mesh.position.y = -0.1;
-//   scene.add(mesh);
-// }
+const gltfloader = new GLTFLoader();
 
-/* -------------------------------------------------- */
-/* Pot (compound collider)                            */
-/* -------------------------------------------------- */
-const loader = new GLTFLoader();
+// Load texture
+const loader = new THREE.TextureLoader();
+loader.load("/images/Jar back.png", (texture) => {
+  // Create geometry
+  const geometry = new THREE.PlaneGeometry(1, 1); // width, height (adjust as needed)
+
+  // Create material with the texture, no lighting
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true, // if PNG has alpha
+    side: 2,
+  });
+
+  // Create mesh
+  const mesh = new THREE.Mesh(geometry, material);
+
+  // Set position
+  mesh.position.set(-3, 3.95, 0); // x, y, z
+  // Optional: scale to match texture aspect ratio
+  const aspect = texture.image.width / texture.image.height;
+  mesh.scale.set(aspect, 1, 1);
+  mesh.scale.multiplyScalar(10.5);
+  mesh.rotation.y = Math.PI / 2;
+  // Add to scene
+  scene.add(mesh);
+});
+loader.load("/images/Jar front.png", (texture) => {
+  // Create geometry
+  const geometry = new THREE.PlaneGeometry(1, 1); // width, height (adjust as needed)
+
+  // Create material with the texture, no lighting
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true, // if PNG has alpha
+    side: 2,
+  });
+
+  // Create mesh
+  const mesh = new THREE.Mesh(geometry, material);
+
+  // Set position
+  mesh.position.set(5, 4.125, 0); // x, y, z
+  // Optional: scale to match texture aspect ratio
+  const aspect = texture.image.width / texture.image.height;
+  mesh.scale.set(aspect, 1, 1);
+  mesh.scale.multiplyScalar(6.8);
+  mesh.rotation.y = Math.PI / 2;
+  // Add to scene
+  scene.add(mesh);
+});
 
 function createPot() {
   const url = "/models/pot2.glb";
 
-  loader.load(url, (gltf) => {
+  gltfloader.load(url, (gltf) => {
     const potMesh = gltf.scene;
     potMesh.position.y = 4;
     potMesh.scale.multiplyScalar(2);
@@ -113,7 +147,7 @@ function createPot() {
 
       const colliderDesc = RAPIER.ColliderDesc.trimesh(
         positions,
-        indices
+        indices,
       ).setFriction(0.0);
 
       world.createCollider(colliderDesc, body);
@@ -128,7 +162,7 @@ createPot();
 /* -------------------------------------------------- */
 let coinMesh = null;
 
-loader.load("/models/coin_compressed2.glb", (gltf) => {
+gltfloader.load("/models/coin_compressed2.glb", (gltf) => {
   let sourceMesh = null;
 
   gltf.scene.traverse((o) => {
@@ -144,6 +178,7 @@ loader.load("/models/coin_compressed2.glb", (gltf) => {
 
   // coinMesh.castShadow = false;
   // coinMesh.receiveShadow = false;
+  spawnCoin(-2);
 
   scene.add(coinMesh);
 });
@@ -179,11 +214,11 @@ function spawnCoin(y) {
       .setTranslation(
         (Math.random() - 0.5) * 1,
         y + 1 * Math.random(),
-        (Math.random() - 0.5) * 1
+        (Math.random() - 0.5) * 1,
       )
       .setRotation(quat)
       .setLinearDamping(0.7)
-      .setAngularDamping(0.2)
+      .setAngularDamping(0.2),
   );
 
   world.createCollider(
@@ -191,7 +226,7 @@ function spawnCoin(y) {
       .setDensity(1.0)
       .setFriction(0.6)
       .setRestitution(0.05),
-    body
+    body,
   );
 
   body.setAngvel(
@@ -200,7 +235,7 @@ function spawnCoin(y) {
       y: (Math.random() - 0.5) * 5,
       z: (Math.random() - 0.5) * 5,
     },
-    true
+    true,
   );
 
   coins.push({
@@ -211,7 +246,7 @@ function spawnCoin(y) {
     dirty: true,
   });
 }
-function freezeCoinAsStatic(c) {
+function freezeCoin(c) {
   if (c.frozen) return;
 
   const { x, y, z } = c.body.translation();
@@ -228,7 +263,7 @@ function freezeCoinAsStatic(c) {
     RAPIER.ColliderDesc.cylinder(0.041, 0.41)
       .setTranslation(x, y, z)
       .setRotation({ x: rx, y: ry, z: rz, w }),
-    staticBody
+    staticBody,
   );
 
   c.body = staticBody;
@@ -236,25 +271,22 @@ function freezeCoinAsStatic(c) {
 }
 
 /* -------------------------------------------------- */
-/* Freeze helper                                      */
-/* -------------------------------------------------- */
-function freezeCoin(c) {
-  //   c.body.setLinvel({ x: 0, y: 0, z: 0 }, false);
-  //   c.body.setAngvel({ x: 0, y: 0, z: 0 }, false);
-  //   c.body.lockTranslations(true, true);
-  //   c.body.lockRotations(true, true);
-  //   c.body.sleep();
-  //   if (!c.frozen) world.removeRigidBody(c.body);
-  //   c.body = null;
-  freezeCoinAsStatic(c);
-  //   c.frozen = true;
-  //   c.dirty = true;
-}
-
-/* -------------------------------------------------- */
 /* Animation loop                                     */
 /* -------------------------------------------------- */
 let spawnTimer = 0;
+
+let lastTime = performance.now();
+let accumulator = 0;
+
+const FIXED_DT = 1 / 60; // 60 Hz physics
+const MAX_DT = 0.1; // prevent spiral of death
+
+let spawnAccumulator = 0;
+const SPAWN_INTERVAL = 0.083; // ~5 frames @60fps
+
+document.addEventListener("visibilitychange", () => {
+  lastTime = performance.now();
+});
 
 function animate() {
   if (!coinMesh) {
@@ -262,17 +294,29 @@ function animate() {
     return;
   }
   requestAnimationFrame(animate);
-  world.step();
 
   const now = performance.now();
 
-  // Spawn coins
   spawnTimer++;
-  if (spawnTimer % 5 === 0) {
-    for (let i = 0; i < 1; i++) {
+
+  let dt = (now - lastTime) / 1000;
+  lastTime = now;
+
+  dt = Math.min(dt, MAX_DT);
+  accumulator += dt;
+
+  // Fixed-step physics
+  while (accumulator >= FIXED_DT) {
+    accumulator -= FIXED_DT;
+    world.step();
+
+    // Spawn coins (time-based, not frame-based)
+    spawnAccumulator += FIXED_DT;
+    if (spawnAccumulator >= SPAWN_INTERVAL) {
+      spawnAccumulator = 0;
       spawnCoin(15);
+      FREEZE_HEIGHT = coinMesh.count / 300;
     }
-    FREEZE_HEIGHT = coinMesh.count / 300;
   }
 
   // Physics → freeze logic
@@ -305,7 +349,7 @@ function animate() {
     tempMatrix.compose(
       tempPos.set(p.x, p.y, p.z),
       tempQuat.set(r.x, r.y, r.z, r.w),
-      tempScale
+      tempScale,
     );
 
     coinMesh.setMatrixAt(c.index, tempMatrix);
