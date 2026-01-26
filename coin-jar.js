@@ -9,8 +9,8 @@ await RAPIER.init();
 /* -------------------------------------------------- */
 /* Constants                                          */
 /* -------------------------------------------------- */
-const MAX_COINS = 2_000;
-const FREEZE_TIME = 100_000; // ms
+const MAX_COINS = 850;
+const FREEZE_TIME = 20_000; // ms
 let FREEZE_HEIGHT = 0.1;
 
 /* -------------------------------------------------- */
@@ -18,16 +18,24 @@ let FREEZE_HEIGHT = 0.1;
 /* -------------------------------------------------- */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x111111);
+const aspect = window.innerWidth / window.innerHeight;
 
-const camera = new THREE.PerspectiveCamera(
-  30,
-  window.innerWidth / window.innerHeight,
+const frustumHeight = 2 * Math.tan(THREE.MathUtils.degToRad(30) / 2) * 20;
+const frustumWidth = frustumHeight * aspect;
+
+const camera = new THREE.OrthographicCamera(
+  -frustumWidth / 2,
+  frustumWidth / 2,
+  frustumHeight / 2,
+  -frustumHeight / 2,
   0.1,
   1000,
 );
+
 const cy = 4.5;
 camera.position.set(20, cy, 0);
 camera.lookAt(0, cy, 0);
+camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -57,11 +65,30 @@ world.integrationParameters.allowedAngularError = 0.01;
 world.integrationParameters.numSolverIterations = 4;
 world.integrationParameters.numInternalPgsIterations = 2;
 
+const group = new THREE.Group();
+group.scale.multiplyScalar(0.6);
+group.position.x = 4;
+scene.add(group);
+
+{
+  const body = world
+    .createRigidBody(RAPIER.RigidBodyDesc.fixed())
+    .translation(0, 10, 0);
+  world.createCollider(RAPIER.ColliderDesc.cuboid(3, 0.3, 3), body);
+
+  // const mesh = new THREE.Mesh(
+  //   new THREE.BoxGeometry(20, 0.2, 20),
+  //   new THREE.MeshStandardMaterial({ color: 0x333333 }),
+  // );
+  // mesh.position.y = -0.1;
+  // group.add(mesh);
+}
+
 /* -------------------------------------------------- */
 /* Debug renderer                                     */
 /* -------------------------------------------------- */
-let showDebug = false;
-const rapierDebugRender = new RapierDebugRenderer(scene, world, showDebug);
+let showDebug = true;
+const rapierDebugRender = new RapierDebugRenderer(group, world, showDebug);
 document.getElementById("debugToggle").addEventListener("change", (e) => {
   showDebug = e.target.checked;
   rapierDebugRender.toggleVisible(showDebug);
@@ -87,14 +114,14 @@ loader.load("/images/Jar back.png", (texture) => {
   const mesh = new THREE.Mesh(geometry, material);
 
   // Set position
-  mesh.position.set(-3, 3.95, 0); // x, y, z
+  mesh.position.set(-5, 4.0, 0.0); // x, y, z
   // Optional: scale to match texture aspect ratio
   const aspect = texture.image.width / texture.image.height;
   mesh.scale.set(aspect, 1, 1);
-  mesh.scale.multiplyScalar(10.25);
+  mesh.scale.multiplyScalar(8.5);
   mesh.rotation.y = Math.PI / 2;
   // Add to scene
-  scene.add(mesh);
+  group.add(mesh);
 });
 loader.load("/images/Jar front.png", (texture) => {
   // Create geometry
@@ -111,14 +138,14 @@ loader.load("/images/Jar front.png", (texture) => {
   const mesh = new THREE.Mesh(geometry, material);
 
   // Set position
-  mesh.position.set(5, 4.2, 0); // x, y, z
+  mesh.position.set(5, 4.0, 0.0); // x, y, z
   // Optional: scale to match texture aspect ratio
   const aspect = texture.image.width / texture.image.height;
   mesh.scale.set(aspect, 1, 1);
-  mesh.scale.multiplyScalar(6.8);
+  mesh.scale.multiplyScalar(8.5);
   mesh.rotation.y = Math.PI / 2;
   // Add to scene
-  scene.add(mesh);
+  group.add(mesh);
 });
 
 function createPot() {
@@ -175,14 +202,13 @@ gltfloader.load("/models/coin_compressed2.glb", (gltf) => {
   const material = sourceMesh.material.clone();
 
   coinMesh = new THREE.InstancedMesh(geometry, material, MAX_COINS);
-
+  coinMesh.frustumCulled = false;
   // coinMesh.castShadow = false;
   // coinMesh.receiveShadow = false;
-  spawnCoin(-2);
+  // spawnCoin(0);
 
-  scene.add(coinMesh);
+  group.add(coinMesh);
 });
-
 /* -------------------------------------------------- */
 /* Coin storage                                       */
 /* -------------------------------------------------- */
@@ -193,7 +219,8 @@ let coinIndex = 0;
 const tempMatrix = new THREE.Matrix4();
 const tempPos = new THREE.Vector3();
 const tempQuat = new THREE.Quaternion();
-const tempScale = new THREE.Vector3(1, 1, 1);
+const scaleFactor = 1.3;
+const tempScale = new THREE.Vector3(scaleFactor, scaleFactor, scaleFactor);
 
 /* -------------------------------------------------- */
 /* Spawn coin                                         */
@@ -204,7 +231,11 @@ function spawnCoin(y) {
   coinMesh.count = coinIndex + 1; // increase only when spawning
   coinCount.innerHTML = coinMesh.count;
   const axis = tempPos
-    .set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1)
+    .set(
+      Math.random() * 2 - 1,
+      Math.random() * 2 - 1,
+      (Math.random() * 2 - 1) / (scaleFactor * scaleFactor),
+    )
     .normalize();
 
   const quat = tempQuat.setFromAxisAngle(axis, Math.random() * Math.PI * 2);
@@ -212,9 +243,9 @@ function spawnCoin(y) {
   const body = world.createRigidBody(
     RAPIER.RigidBodyDesc.dynamic()
       .setTranslation(
-        (Math.random() - 0.5) * 1,
-        y + 1 * Math.random(),
-        (Math.random() - 0.5) * 1,
+        ((Math.random() - 0.5) * 1) * (scaleFactor * scaleFactor),
+        y + scaleFactor * Math.random() - 3,
+        ((Math.random() - 0.5) * 1) * (scaleFactor * scaleFactor),
       )
       .setRotation(quat)
       .setLinearDamping(0.7)
@@ -222,7 +253,7 @@ function spawnCoin(y) {
   );
 
   world.createCollider(
-    RAPIER.ColliderDesc.cylinder(0.045, 0.45)
+    RAPIER.ColliderDesc.cylinder(0.045 * scaleFactor, 0.45 * scaleFactor)
       .setDensity(1.0)
       .setFriction(0.6)
       .setRestitution(0.05),
@@ -237,8 +268,7 @@ function spawnCoin(y) {
     },
     true,
   );
-  body.enableCcd(true)
-  
+  body.enableCcd(true);
 
   coins.push({
     body,
@@ -262,7 +292,7 @@ function freezeCoin(c) {
 
   // Attach collider with translation & rotation baked in
   world.createCollider(
-    RAPIER.ColliderDesc.cylinder(0.041, 0.41)
+    RAPIER.ColliderDesc.cylinder(0.041 * scaleFactor, 0.41 * scaleFactor)
       .setTranslation(x, y, z)
       .setRotation({ x: rx, y: ry, z: rz, w }),
     staticBody,
@@ -288,6 +318,17 @@ const SPAWN_INTERVAL = 0.083; // ~5 frames @60fps
 
 document.addEventListener("visibilitychange", () => {
   lastTime = performance.now();
+});
+
+window.addEventListener("resize", () => {
+  const aspect = window.innerWidth / window.innerHeight;
+
+  camera.left = (-frustumHeight * aspect) / 2;
+  camera.right = (frustumHeight * aspect) / 2;
+  camera.top = frustumHeight / 2;
+  camera.bottom = -frustumHeight / 2;
+
+  // camera.updateProjectionMatrix();
 });
 
 function animate() {
