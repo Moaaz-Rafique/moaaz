@@ -130,3 +130,7 @@ dist
 .pnp.*
 
 public/assets1/*
+somedata/data/
+chromdata
+somedata/
+chromedata/
