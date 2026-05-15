@@ -25,8 +25,13 @@ import {
   mx_noise_float,
   max,
   min,
+  vec4,
+  select,
+  step,
 } from "three/tsl";
 import * as THREE from "three/webgpu";
+
+THREE.Node.captureStackTrace = true;
 
 const canvas = document.querySelector("canvas.webgl");
 
@@ -72,26 +77,14 @@ window.addEventListener("mousemove", (event) => {
   cursor.y = event.clientY / sizes.height - 0.5;
 });
 
-/**
- * Camera
- */
-// Group
-const cameraGroup = new THREE.Group();
-scene.add(cameraGroup);
-
-// Base camera
 const camera = new THREE.PerspectiveCamera(
   35,
   sizes.width / sizes.height,
   0.1,
   100,
 );
-camera.position.z = 6;
-cameraGroup.add(camera);
+camera.position.z = 10;
 
-/**
- * Renderer
- */
 const renderer = new THREE.WebGPURenderer({
   canvas: canvas,
   alpha: true,
@@ -103,12 +96,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const postProcessing = new THREE.RenderPipeline(renderer);
 const scenePass = pass(scene, camera);
 const scenePassColor = scenePass.getTextureNode();
-const bloomFilter = bloom(scenePassColor);
+const bloomFilter = bloom(scenePassColor, 1.2, .1, .135);
 postProcessing.outputNode = scenePassColor
-  .add(bloomFilter.mul(0.5))
-  .mul(film(bloomFilter));
-
-// postProcessing.outputNode = bloomFilter;
+  .add(bloomFilter)
+  .mul(film(bloomFilter, 0.25));
 
 const N = 100;
 const radius = 2;
@@ -117,6 +108,7 @@ const sphere = new THREE.Mesh(
   new THREE.MeshStandardMaterial({ color: "gray" }),
 );
 scene.add(sphere);
+
 const url = "/models/lightning.glb";
 const loader = new THREE.TextureLoader();
 const dist = loader.load("/images/dist.png");
@@ -124,33 +116,25 @@ const planeMat = new THREE.MeshStandardNodeMaterial({
   side: THREE.DoubleSide,
   transparent: true,
 });
-
-// Animated grayscale pulse with per-instance phase
 const SPEED = 10.0;
 const BURST_DELAY = 0.05;
 
-const phase = float(instanceIndex.mul(12.9898));
+// FORCE scalar via arithmetic (NOT float())
+const phase = instanceIndex.mul(12.9898);
+const pulse = time.mul(SPEED).add(phase).mul(BURST_DELAY).mod(1.0);
+const offset = float(pulse);
+let finalColor = vec4(float(1).sub(offset.mul(3)), 1, 1, 1);
 
-const pulse = time.mul(SPEED).add(phase).mul(BURST_DELAY).mod(1);
+planeMat.colorNode = finalColor;
 
-const offset = pulse;
-
-planeMat.colorNode = mix(color(0xbbffff), color("cyan"), offset.mul(3));
-
-const animatedUV = uv().add(vec2(0, 0));
-
-const tex = texture(dist, animatedUV);
-planeMat.opacityNode = tex
+const animatedUV = uv();
+const texVal = texture(dist, animatedUV).x;
+const noiseVal = mx_noise_float(uv().mul(10.0).add(phase).add(time))
   .abs()
-  .sub(mx_noise_float(uv().mul(10).add(phase).add(time)).abs().mul(0.5))
-  .sub(0.4)
-  .greaterThan(offset);
-
+  .mul(0.5);
+const mask = texVal.sub(noiseVal).sub(offset);
+planeMat.opacityNode = step(0.4, mask);
 planeMat.blending = THREE.AdditiveBlending;
-
-// ======================================================
-// LOAD MODEL
-// ======================================================
 
 const gltfLoader = new GLTFLoader();
 
@@ -163,24 +147,12 @@ gltfLoader.load(url, (gltf) => {
 
   if (!sourceMesh) return;
 
-  const instanced = new THREE.InstancedMesh(
-    sourceMesh.geometry,
-    // new THREE.MeshBasicMaterial({ side: 2 }),
-    planeMat,
-    N,
-  );
+  const instanced = new THREE.InstancedMesh(sourceMesh.geometry, planeMat, N);
 
   scene.add(instanced);
 
   const dummy = new THREE.Object3D();
   const up = new THREE.Vector3(0, 1, 0);
-
-  // --------------------------------------------------
-  // ATTRIBUTES (SAFE FOR WEBGPU)
-  // --------------------------------------------------
-
-  const instancePos = new Float32Array(N * 3);
-  const instanceQuat = new Float32Array(N * 4);
 
   for (let i = 0; i < N; i++) {
     const theta = Math.random() * Math.PI * 2;
@@ -191,51 +163,21 @@ gltfLoader.load(url, (gltf) => {
     const z = radius * Math.sin(phi) * Math.sin(theta);
 
     const position = new THREE.Vector3(x, y, z);
-
     const normal = position.clone().normalize();
-
     const align = new THREE.Quaternion().setFromUnitVectors(up, normal);
-
     const twist = new THREE.Quaternion().setFromAxisAngle(
       normal,
       Math.random() * Math.PI * 2,
     );
-
     const quat = new THREE.Quaternion().copy(twist).multiply(align);
 
     dummy.position.copy(position);
     dummy.quaternion.copy(quat);
-    // const scale
-    // dummy.scale.set(1, 1, 1).multiplyScalar(.5);
-
     dummy.updateMatrix();
-
     instanced.setMatrixAt(i, dummy.matrix);
-
-    // store position
-    instancePos[i * 3 + 0] = position.x;
-    instancePos[i * 3 + 1] = position.y;
-    instancePos[i * 3 + 2] = position.z;
-
-    // store quaternion
-    instanceQuat[i * 4 + 0] = quat.x;
-    instanceQuat[i * 4 + 1] = quat.y;
-    instanceQuat[i * 4 + 2] = quat.z;
-    instanceQuat[i * 4 + 3] = quat.w;
   }
 
   instanced.instanceMatrix.needsUpdate = true;
-
-  // attach attributes
-  instanced.geometry.setAttribute(
-    "iPos",
-    new THREE.InstancedBufferAttribute(instancePos, 3),
-  );
-
-  instanced.geometry.setAttribute(
-    "iQuat",
-    new THREE.InstancedBufferAttribute(instanceQuat, 4),
-  );
 });
 const orbit = new OrbitControls(camera, renderer.domElement);
 
@@ -243,7 +185,6 @@ orbit.update();
 const tick = () => {
   orbit.enablePan = true;
   postProcessing.render();
-  // renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };
 tick();
