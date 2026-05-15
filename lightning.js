@@ -138,7 +138,7 @@ gltfLoader.load(url, (gltf) => {
   const mask = texVal.sub(noiseVal).sub(offset);
   planeMat.opacityNode = step(0.4, mask);
   planeMat.blending = THREE.AdditiveBlending;
-
+  console.log(planeMat)
   let sourceMesh = null;
 
   gltf.scene.traverse((obj) => {
