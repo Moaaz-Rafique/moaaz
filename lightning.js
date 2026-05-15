@@ -96,7 +96,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const postProcessing = new THREE.RenderPipeline(renderer);
 const scenePass = pass(scene, camera);
 const scenePassColor = scenePass.getTextureNode();
-const bloomFilter = bloom(scenePassColor, 1.2, .1, .135);
+const bloomFilter = bloom(scenePassColor, 1.2, 0.1, 0.135);
 postProcessing.outputNode = scenePassColor
   .add(bloomFilter)
   .mul(film(bloomFilter, 0.25));
@@ -112,33 +112,33 @@ scene.add(sphere);
 const url = "/models/lightning.glb";
 const loader = new THREE.TextureLoader();
 const dist = loader.load("/images/dist.png");
-const planeMat = new THREE.MeshStandardNodeMaterial({
-  side: THREE.DoubleSide,
-  transparent: true,
-});
-const SPEED = 10.0;
-const BURST_DELAY = 0.05;
-
-// FORCE scalar via arithmetic (NOT float())
-const phase = instanceIndex.mul(12.9898);
-const pulse = time.mul(SPEED).add(phase).mul(BURST_DELAY).mod(1.0);
-const offset = float(pulse);
-let finalColor = vec4(float(1).sub(offset.mul(3)), 1, 1, 1);
-
-planeMat.colorNode = finalColor;
-
-const animatedUV = uv();
-const texVal = texture(dist, animatedUV).x;
-const noiseVal = mx_noise_float(uv().mul(10.0).add(phase).add(time))
-  .abs()
-  .mul(0.5);
-const mask = texVal.sub(noiseVal).sub(offset);
-planeMat.opacityNode = step(0.4, mask);
-planeMat.blending = THREE.AdditiveBlending;
 
 const gltfLoader = new GLTFLoader();
 
 gltfLoader.load(url, (gltf) => {
+  const planeMat = new THREE.MeshStandardNodeMaterial({
+    side: THREE.DoubleSide,
+    transparent: true,
+  });
+  const SPEED = 10.0;
+  const BURST_DELAY = 0.05;
+
+  const phase = instanceIndex.mul(12.9898);
+  const pulse = time.mul(SPEED).add(phase).mul(BURST_DELAY).mod(1.0);
+  const offset = float(pulse);
+  let finalColor = vec4(float(1).sub(offset.mul(3)), 1, 1, 1);
+
+  planeMat.colorNode = finalColor;
+
+  const animatedUV = uv();
+  const texVal = texture(dist, animatedUV).x;
+  const noiseVal = mx_noise_float(uv().mul(10.0).add(phase).add(time))
+    .abs()
+    .mul(0.5);
+  const mask = texVal.sub(noiseVal).sub(offset);
+  planeMat.opacityNode = step(0.4, mask);
+  planeMat.blending = THREE.AdditiveBlending;
+
   let sourceMesh = null;
 
   gltf.scene.traverse((obj) => {
@@ -183,7 +183,6 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 
 orbit.update();
 const tick = () => {
-  orbit.enablePan = true;
   postProcessing.render();
   window.requestAnimationFrame(tick);
 };
