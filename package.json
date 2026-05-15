@@ -14,7 +14,7 @@
     "gsap": "^3.13.0",
     "pixi-filters": "^6.1.4",
     "pixi.js": "^8.14.0",
-    "three": "^0.182.0"
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@rollup/plugin-babel": "^6.0.4",
