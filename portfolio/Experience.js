@@ -6,7 +6,7 @@ export class Experience {
     this.canvas = document.querySelector(canvasSelector);
     this.scene = new THREE.Scene();
     this.sizes = { width: window.innerWidth, height: window.innerHeight };
-    
+
     this.initLights();
     this.initCamera();
     this.onUpdateCallbacks = [];
@@ -26,7 +26,7 @@ export class Experience {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    
+
     // Start loop
     this.tick();
   }
@@ -39,7 +39,12 @@ export class Experience {
   }
 
   initCamera() {
-    this.camera = new THREE.PerspectiveCamera(35, this.sizes.width / this.sizes.height, 0.1, 100);
+    this.camera = new THREE.PerspectiveCamera(
+      35,
+      this.sizes.width / this.sizes.height,
+      0.1,
+      100,
+    );
     this.camera.position.set(0, 0, 10);
   }
 

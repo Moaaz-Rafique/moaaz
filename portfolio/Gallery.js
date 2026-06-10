@@ -2,6 +2,7 @@ import * as THREE from "three/webgpu";
 import { thumbnails, APPEAR_DELAY } from "./config.js";
 import { createGalleryMaterial } from "./GalleryMaterial.js";
 import { calculateGridLayout } from "./GalleryLayout.js";
+import { vec2 } from "three/tsl";
 
 const STATES = {
   LOADING: "LOADING",
@@ -23,6 +24,7 @@ export class Gallery {
     this.pointer = new THREE.Vector2(-1000, -1000);
     this.raycaster = new THREE.Raycaster();
     this.hovered = null;
+    this.hoveredUVs = null;
 
     this.scrollCurrentY = 0;
     this.scrollTargetY = 0;
@@ -53,7 +55,9 @@ export class Gallery {
     this.fullManager = new THREE.LoadingManager();
 
     this.textureLoader = new THREE.TextureLoader(this.thumbManager);
+    this.textureLoader.path = '/portfolio/'
     this.fullTextureLoader = new THREE.TextureLoader(this.fullManager);
+    this.fullTextureLoader.path = '/portfolio/'
 
     this.thumbManager.onLoad = () => this.loadFullImages();
     this.fullManager.onProgress = (url, loaded, total) => {
@@ -86,16 +90,32 @@ export class Gallery {
 
       if (this.isDragging && this.currentState === STATES.READY) {
         const deltaY = e.clientY - this.startY;
-        this.scrollTargetY += deltaY * 0.07; 
+        this.scrollTargetY += deltaY * 0.07;
         this.startY = e.clientY;
+      }
+      // OPTIMIZATION: Bypasses raycasting logic on frames during system loading state
+      if (this.currentState !== STATES.LOADING) {
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.raycastTargets);
+        if (intersects.length > 0) {
+          this.hovered = intersects[0].object;
+          this.hoveredUVs = intersects[0].uv;
+        } else {
+          this.hovered = null;
+          this.hoveredUVs = null;
+        }
       }
     });
 
-    window.addEventListener("wheel", (e) => {
-      if (this.currentState === STATES.READY) {
-        this.scrollTargetY -= e.deltaY * 0.003;
-      }
-    }, { passive: true });
+    window.addEventListener(
+      "wheel",
+      (e) => {
+        if (this.currentState === STATES.READY) {
+          this.scrollTargetY -= e.deltaY * 0.003;
+        }
+      },
+      { passive: true },
+    );
 
     window.addEventListener("pointerdown", (e) => {
       if (this.currentState === STATES.READY) {
@@ -134,7 +154,8 @@ export class Gallery {
         const row = Math.floor(index / layout.cols);
 
         const gridX = (col - (layout.cols - 1) / 2) * layout.spacingX;
-        const gridY = layout.viewHeight / 2 - row * layout.spacingY - layout.height / 2;
+        const gridY =
+          layout.viewHeight / 2 - row * layout.spacingY - layout.height / 2;
 
         this.imagePlanes.push({
           mesh,
@@ -150,6 +171,7 @@ export class Gallery {
           transitionNode: nodes.transitionNode,
           fuNode: nodes.fuNode,
           hoverNode: nodes.hoverNode,
+          hoverPositionUV: nodes.hoverPositionUV,
           hover: 0,
         });
       });
@@ -170,13 +192,6 @@ export class Gallery {
   }
 
   update(now) {
-    // OPTIMIZATION: Bypasses raycasting logic on frames during system loading state
-    if (this.currentState !== STATES.LOADING) {
-      this.raycaster.setFromCamera(this.pointer, this.camera);
-      const intersects = this.raycaster.intersectObjects(this.raycastTargets);
-      this.hovered = intersects.length > 0 ? intersects[0].object : null;
-    }
-
     switch (this.currentState) {
       case STATES.LOADING: {
         this.imagePlanes.forEach((item) => {
@@ -188,7 +203,11 @@ export class Gallery {
 
           mesh.visible = true;
           item.currentX = THREE.MathUtils.lerp(item.prev.x, item.target.x, t);
-          item.currentRz = THREE.MathUtils.lerp(item.prev.rz, item.target.rz, t);
+          item.currentRz = THREE.MathUtils.lerp(
+            item.prev.rz,
+            item.target.rz,
+            t,
+          );
 
           mesh.position.x = item.currentX;
           mesh.rotation.z = item.currentRz;
@@ -204,7 +223,8 @@ export class Gallery {
         }
 
         if (finalProgress >= 0.999) {
-          if (this.loaderElement) this.loaderElement.style.setProperty("--p", 1);
+          if (this.loaderElement)
+            this.loaderElement.style.setProperty("--p", 1);
           this.currentState = STATES.WAITING;
         }
         break;
@@ -226,25 +246,47 @@ export class Gallery {
 
       case STATES.READY: {
         const elapsed = now - this.readyStartTime;
-        const duration = 1200; 
+        const duration = 1200;
         const t = THREE.MathUtils.clamp(elapsed / duration, 0, 1);
-        const ease = t * t * (3 - 2 * t); 
+        const ease = t * t * (3 - 2 * t);
 
-        this.scrollTargetY = THREE.MathUtils.clamp(this.scrollTargetY, -this.maxScrollY, 0);
-        this.scrollCurrentY = THREE.MathUtils.lerp(this.scrollCurrentY, this.scrollTargetY, 0.1);
+        this.scrollTargetY = THREE.MathUtils.clamp(
+          this.scrollTargetY,
+          -this.maxScrollY,
+          0,
+        );
+        this.scrollCurrentY = THREE.MathUtils.lerp(
+          this.scrollCurrentY,
+          this.scrollTargetY,
+          0.1,
+        );
 
         this.imagePlanes.forEach((item, index) => {
           const mesh = item.mesh;
           const isHovered = mesh === this.hovered;
 
-          item.hover = THREE.MathUtils.lerp(item.hover, isHovered ? 1 : 0, 0.08);
+          item.hover = THREE.MathUtils.lerp(
+            item.hover,
+            isHovered ? 1 : 0,
+            0.08,
+          );
           item.hoverNode.value = item.hover;
+          console.log(item);
 
-          mesh.position.x = THREE.MathUtils.lerp(item.currentX, item.grid.x, ease) + item.hover * 0.08;
+          if (isHovered) item.hoverPositionUV.value = vec2(this.hoveredUVs);
+
+          mesh.position.x =
+            THREE.MathUtils.lerp(item.currentX, item.grid.x, ease) +
+            item.hover * 0.08;
           mesh.position.z = -index * 0.01 + item.hover * 0.2;
-          mesh.position.y = THREE.MathUtils.lerp(0, item.grid.y - this.scrollCurrentY, ease);
-          mesh.rotation.z = THREE.MathUtils.lerp(item.currentRz, 0, ease) + item.hover * 0.03;
-          
+          mesh.position.y = THREE.MathUtils.lerp(
+            0,
+            item.grid.y - this.scrollCurrentY,
+            ease,
+          );
+          mesh.rotation.z =
+            THREE.MathUtils.lerp(item.currentRz, 0, ease) + item.hover * 0.03;
+
           mesh.scale.setScalar(1 + item.hover * 0.04);
 
           if (item.transitionNode) {

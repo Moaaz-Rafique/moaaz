@@ -18,6 +18,7 @@ export function createGalleryMaterial(thumbTexture) {
   // 1. Dynamic TSL Uniforms controlled from CPU
   const transitionNode = uniform(0);
   const hoverNode = uniform(0);
+  const hoverPositionUV = uniform(vec2(-100));
 
   // 2. Initialize full image placeholder
   const placeholderTex = new THREE.Texture();
@@ -76,6 +77,7 @@ export function createGalleryMaterial(thumbTexture) {
       transitionNode,
       fuNode,
       hoverNode,
+      hoverPositionUV
     },
   };
 }
