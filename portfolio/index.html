@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Portfolio</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #111;
+      }
+      #ui {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        color: white;
+        font-family: sans-serif;
+      }
+      #loader {
+        vertical-align: center;
+        text-align: center;
+        z-index: 100;
+        position: fixed;
+        bottom: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20%;
+        height: 80px;
+        overflow: hidden;
+        background: linear-gradient(
+          90deg,
+          #ff3b3b,
+          #ffb800,
+          #00ff88,
+          #00c2ff,
+          #7a5cff
+        );
+        backface-visibility: hidden;
+
+        --p: 0;
+      }
+      #loader::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: #111;
+
+        transform-origin: left;
+        transform: scaleX(1);
+      }
+      #loader::after {
+        transform: scaleX(calc(1 - var(--p)));
+        transform-origin: right;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="webgl"></canvas>
+
+    <div id="loader">
+      <h1 id="btn">Loading</h1>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
