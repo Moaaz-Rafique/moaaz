@@ -1,19 +1,25 @@
-export async function getNetworkSpeedFactor() {
+export async function getAdaptiveDelay() {
+  const conn = navigator.connection;
+
+  let factor = 1.0;
+
+  // 1. network type hint
+  if (conn?.effectiveType === "slow-2g") factor *= 2.5;
+  else if (conn?.effectiveType === "2g") factor *= 2.0;
+  else if (conn?.effectiveType === "3g") factor *= 1.4;
+
+  // 2. real-world load measurement
   const start = performance.now();
+  await fetch("/portfolio/ping.jpg", { cache: "no-store" });
+  const t = performance.now() - start;
 
-  await fetch("/portfolio/dist.png?cache=" + Date.now(), {
-    cache: "no-store",
-  });
+  if (t > 500) factor *= 1.3;
+  else if (t < 150) factor *= 0.8;
 
-  const duration = performance.now() - start;
-
-  // rough mapping
-  if (duration < 150) return 0.6; // fast internet
-  if (duration < 400) return 1.0; // normal
-  return 1.6; // slow
+  return factor;
 }
 export const BASE_APPEAR_DELAY = 300;
-const speedFactor = await getNetworkSpeedFactor();
+const speedFactor = await getAdaptiveDelay();
 
 export const APPEAR_DELAY = BASE_APPEAR_DELAY * speedFactor;
 
