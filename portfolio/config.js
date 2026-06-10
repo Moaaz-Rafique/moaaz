@@ -1,4 +1,4 @@
-export const APPEAR_DELAY = 20; // ms between thumbnails
+export const APPEAR_DELAY = 100; // ms between thumbnails
 
 export const thumbnails = [
   {
