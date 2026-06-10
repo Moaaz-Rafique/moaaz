@@ -232,7 +232,7 @@ export class Gallery {
 
       case STATES.WAITING: {
         if (this.btnElement) {
-          this.btnElement.innerText = "Click to Enter";
+          this.btnElement.innerText = "Enter";
         }
 
         this.imagePlanes.forEach((item) => {

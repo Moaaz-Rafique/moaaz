@@ -1,4 +1,21 @@
-export const APPEAR_DELAY = 300; // ms between thumbnails
+export async function getNetworkSpeedFactor() {
+  const start = performance.now();
+
+  await fetch("/portfolio/dist.png?cache=" + Date.now(), {
+    cache: "no-store",
+  });
+
+  const duration = performance.now() - start;
+
+  // rough mapping
+  if (duration < 150) return 0.6; // fast internet
+  if (duration < 400) return 1.0; // normal
+  return 1.6; // slow
+}
+export const BASE_APPEAR_DELAY = 300;
+const speedFactor = await getNetworkSpeedFactor();
+
+export const APPEAR_DELAY = BASE_APPEAR_DELAY * speedFactor;
 
 export const thumbnails = [
   {
