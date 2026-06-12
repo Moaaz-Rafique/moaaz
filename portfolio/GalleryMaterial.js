@@ -56,7 +56,7 @@ export function createGalleryMaterial(thumbTexture) {
     .and(uvNode.y.lessThanEqual(maxY));
 
   const full = texture(fuNode);
-  const fullCropped = mix(vec4(0, 0, 0, 0), full, animatedFull);
+  const fullCropped = mix(vec4(0, 0, 0, 0), full, animatedFull.or(transitionNode.greaterThanEqual(1)));
 
   // Final mixed output texture
   const tex = mix(thumbCropped, fullCropped, transitionNode.greaterThan(0));

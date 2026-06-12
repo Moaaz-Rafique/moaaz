@@ -1,0 +1,16 @@
+#map {
+  height: 500px;
+  border-radius: 0.75rem;
+  z-index: 1;
+  background: #020617;
+}
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}

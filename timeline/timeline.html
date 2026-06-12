@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Location Intelligence System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      #map {
+        height: 500px;
+        border-radius: 0.75rem;
+        z-index: 1;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1e293b;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen font-sans">
+    <div class="max-w-7xl mx-auto p-4 md:p-6">
+      <header
+        class="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b border-slate-800 pb-6 mb-6 gap-4"
+      >
+        <div>
+          <h1
+            class="text-2xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent"
+          >
+            GEO-SPATIAL INTELLIGENCE CORE
+          </h1>
+          <p class="text-slate-400 text-xs mt-0.5">
+            Automated OpenStreetMap Enrichment, Proximity Spatial Clustering &
+            Temporal Filtering Engines
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <button
+            id="demoBtn"
+            class="flex-1 lg:flex-none px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg transition border border-slate-700"
+          >
+            Load Multi-Month Demo
+          </button>
+          <label
+            class="flex-1 lg:flex-none text-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg cursor-pointer transition shadow-lg shadow-blue-500/20"
+          >
+            Upload Tracking JSON
+            <input type="file" id="fileInput" accept=".json" class="hidden" />
+          </label>
+        </div>
+      </header>
+
+      <div
+        class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800"
+      >
+        <div>
+          <label
+            class="block text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-wider"
+            >Filter Temporal Year</label
+          >
+          <select
+            id="yearFilter"
+            class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+          >
+            <option value="ALL">All Available Years</option>
+          </select>
+        </div>
+        <div>
+          <label
+            class="block text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-wider"
+            >Filter Temporal Month</label
+          >
+          <select
+            id="monthFilter"
+            class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+          >
+            <option value="ALL">All Available Months</option>
+          </select>
+        </div>
+        <div>
+          <label
+            class="block text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-wider"
+            >Proximity Threshold Cluster Boundary</label
+          >
+          <div class="flex items-center gap-3 mt-1">
+            <input
+              type="range"
+              id="radiusSlider"
+              min="100"
+              max="2000"
+              step="100"
+              value="2000"
+              class="w-full accent-cyan-500"
+            />
+            <span
+              id="radiusVal"
+              class="text-xs font-mono font-bold text-cyan-400 whitespace-nowrap"
+              >500m</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <div
+            class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-2xl relative"
+          >
+            <div
+              id="osmStatus"
+              class="hidden absolute top-6 right-6 bg-slate-950/90 text-cyan-400 text-[10px] font-mono px-2.5 py-1 rounded-md border border-cyan-500/30 shadow-md animate-pulse z-[1000]"
+            >
+              🔄 Querying OpenStreetMap API Data...
+            </div>
+            <h2
+              class="text-sm font-bold uppercase tracking-wider mb-3 text-slate-300 flex items-center gap-2"
+            >
+              <span>🗺️</span> Spatial Mapping Matrix
+            </h2>
+            <div id="map" class="bg-slate-950"></div>
+          </div>
+
+          <div
+            class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-2xl"
+          >
+            <h2
+              class="text-sm font-bold uppercase tracking-wider mb-3 text-slate-300 flex items-center gap-2"
+            >
+              <span>📋</span> Contextual Segment Tracking Logs
+            </h2>
+            <div
+              id="timelineContainer"
+              class="space-y-2 max-h-52 overflow-y-auto pr-1"
+            >
+              <p class="text-slate-500 text-xs italic p-2 text-center">
+                Awaiting localized system data parameters...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div
+            class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-2xl"
+          >
+            <h2
+              class="text-sm font-bold uppercase tracking-wider mb-3 text-slate-300 flex items-center gap-2"
+            >
+              <span>🏢</span> Enriched Anchor Nodes (OSM Feed)
+            </h2>
+            <div
+              id="frequentPlacesContainer"
+              class="space-y-3 max-h-64 overflow-y-auto pr-1"
+            >
+              <p class="text-slate-500 text-xs italic text-center p-2">
+                No active anchor nodes loaded.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-2xl"
+          >
+            <h2
+              class="text-sm font-bold uppercase tracking-wider mb-3 text-slate-300 flex items-center gap-2"
+            >
+              <span>📊</span> Proximity Cluster Density
+            </h2>
+            <div class="h-48 relative">
+              <canvas id="proximityChart"></canvas>
+            </div>
+          </div>
+
+          <div
+            class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-2xl"
+          >
+            <h2
+              class="text-sm font-bold uppercase tracking-wider mb-2 text-slate-300"
+            >
+              Telemetry Payload Metadata
+            </h2>
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div
+                class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"
+              >
+                <span class="text-[10px] text-slate-400 block uppercase"
+                  >Parsed Signals</span
+                >
+                <span
+                  id="metaSignals"
+                  class="text-lg font-mono font-bold text-blue-400"
+                  >0</span
+                >
+              </div>
+              <div
+                class="bg-slate-950 p-2.5 rounded-lg border border-slate-800"
+              >
+                <span class="text-[10px] text-slate-400 block uppercase"
+                  >Visible Filtered</span
+                >
+                <span
+                  id="metaFiltered"
+                  class="text-lg font-mono font-bold text-amber-400"
+                  >0</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global State Controller
+      let globalStateData = null;
+      let mapInstance = null;
+      let chartInstance = null;
+      let mapLayers = [];
+      let osmCache = {}; // Cache map coordinates to optimize performance
+
+      // Initialize Base Topographical Map
+      function initMapSystem() {
+        mapInstance = L.map("map").setView([33.6844, 73.0479], 12); // Defaults over Islamabad coordinates
+        L.tileLayer(
+          "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+          {
+            attribution: "&copy; OpenStreetMap &copy; CARTO",
+          },
+        ).addTo(mapInstance);
+      }
+      initMapSystem();
+
+      // Haversine Distance Calculator (Structural Proximity Logic)
+      function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000; // Radius of Earth in Meters
+        const phi1 = (lat1 * Math.PI) / 180;
+        const phi2 = (lat2 * Math.PI) / 180;
+        const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+        const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+          Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+          Math.cos(phi1) *
+            Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) *
+            Math.sin(deltaLambda / 2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+      }
+
+      // Helper: Safe Coordinate Extraction
+      function parseCoords(str) {
+        if (!str) return null;
+        const parts = str.split(",");
+        return parts.length === 2
+          ? { lat: parseFloat(parts[0]), lng: parseFloat(parts[1]) }
+          : null;
+      }
+
+      // Asynchronous OpenStreetMap Reverse Geocoding Engine
+      async function fetchOSMData(lat, lng) {
+        const cacheKey = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+        if (osmCache[cacheKey]) return osmCache[cacheKey];
+
+        document.getElementById("osmStatus").classList.remove("hidden");
+        try {
+          // Respecting OpenStreetMap terms: usage of identifiable User-Agent header string
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
+            {
+              headers: {
+                "User-Agent": "SystemLocationHistoryAnalyticsEngine/2.0",
+              },
+            },
+          );
+          const data = await response.json();
+
+          // Mine out structural business activity tags
+          const tagInfo = data.type || data.category || "Location Point";
+          const commercialName =
+            data.name ||
+            data.address?.amenity ||
+            data.address?.shop ||
+            data.address?.hotel ||
+            data.address?.road ||
+            "Established POI";
+
+          osmCache[cacheKey] = {
+            type: tagInfo.charAt(0).toUpperCase() + tagInfo.slice(1),
+            name: commercialName,
+          };
+          return osmCache[cacheKey];
+        } catch (err) {
+          return { type: "POI Node", name: "Resolved Destination Area" };
+        } finally {
+          document.getElementById("osmStatus").classList.add("hidden");
+        }
+      }
+
+      // Multi-Month 2026 Telemetry Simulation Data Block matching User Schema Strategy
+      const comprehensiveMockData = {
+        semanticSegments: [
+          {
+            startTime: "2026-05-10T09:00:00",
+            endTime: "2026-05-10T18:00:00",
+            timelinePath: [{ point: "33.7294, 73.0397", time: "12:00" }],
+          },
+          {
+            startTime: "2026-06-11T08:00:00",
+            endTime: "2026-06-11T08:45:00",
+            timelinePath: [
+              { point: "33.6844, 73.0479", time: "08:15" },
+              { point: "33.7112, 73.0565", time: "08:35" },
+            ],
+          },
+          {
+            startTime: "2026-06-11T09:00:00",
+            endTime: "2026-06-11T17:00:00",
+            timelinePath: [{ point: "33.7294, 73.0397", time: "13:00" }],
+          },
+        ],
+        rawSignals: [
+          // May 2026 Core Track
+          {
+            position: {
+              LatLng: "33.6844, 73.0479",
+              accuracyMeters: 5,
+              altitudeMeters: 540,
+              source: "GPS",
+              timestamp: "2026-05-10T08:10:00Z",
+              speedMetersPerSecond: 4.5,
+            },
+          },
+          {
+            position: {
+              LatLng: "33.7010, 73.0510",
+              accuracyMeters: 10,
+              altitudeMeters: 542,
+              source: "Cell",
+              timestamp: "2026-05-10T08:30:00Z",
+              speedMetersPerSecond: 14.2,
+            },
+          },
+          {
+            position: {
+              LatLng: "33.7294, 73.0397",
+              accuracyMeters: 3,
+              altitudeMeters: 551,
+              source: "GPS",
+              timestamp: "2026-05-10T09:15:00Z",
+              speedMetersPerSecond: 0,
+            },
+          },
+          // June 2026 Core Track
+          {
+            position: {
+              LatLng: "33.6844, 73.0479",
+              accuracyMeters: 4,
+              altitudeMeters: 540,
+              source: "GPS",
+              timestamp: "2026-06-11T07:55:00Z",
+              speedMetersPerSecond: 0,
+            },
+          },
+          {
+            position: {
+              LatLng: "33.7150, 73.0600",
+              accuracyMeters: 7,
+              altitudeMeters: 546,
+              source: "GPS",
+              timestamp: "2026-06-11T08:20:00Z",
+              speedMetersPerSecond: 12.8,
+            },
+          },
+          {
+            position: {
+              LatLng: "33.7294, 73.0397",
+              accuracyMeters: 3,
+              altitudeMeters: 550,
+              source: "GPS",
+              timestamp: "2026-06-11T08:50:00Z",
+              speedMetersPerSecond: 0,
+            },
+          },
+          {
+            position: {
+              LatLng: "33.7312, 73.0420",
+              accuracyMeters: 15,
+              altitudeMeters: 548,
+              source: "WiFi",
+              timestamp: "2026-06-11T14:10:00Z",
+              speedMetersPerSecond: 1.1,
+            },
+          },
+        ],
+        userLocationProfile: {
+          frequentPlaces: [
+            {
+              placeId: "LOC-HOME",
+              placeLocation: "33.6844, 73.0479",
+              label: "Residential Base Sector",
+            },
+            {
+              placeId: "LOC-WORK",
+              placeLocation: "33.7294, 73.0397",
+              label: "Central Corporate Office",
+            },
+          ],
+          persona: { travelModeAffinities: [] },
+        },
+      };
+
+      // UI Event Wiring
+      document
+        .getElementById("demoBtn")
+        .addEventListener("click", () =>
+          processDataPayload(comprehensiveMockData),
+        );
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", parseUploadedJSON);
+      document
+        .getElementById("yearFilter")
+        .addEventListener("change", applyDataTransformationFilters);
+      document
+        .getElementById("monthFilter")
+        .addEventListener("change", applyDataTransformationFilters);
+      document.getElementById("radiusSlider").addEventListener("input", (e) => {
+        document.getElementById("radiusVal").innerText = e.target.value + "m";
+        applyDataTransformationFilters();
+      });
+
+      function parseUploadedJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          try {
+            const parsed = JSON.parse(evt.target.result);
+            processDataPayload(parsed);
+          } catch (err) {
+            alert(
+              "JSON syntax structure failure. Verify file schema compatibility metrics.",
+            );
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      // Processing Logic Core Engine
+      async function processDataPayload(incomingData) {
+        globalStateData = incomingData;
+
+        // Rebuild selection arrays for temporal filters dynamically
+        const yearsSet = new Set();
+        const monthsSet = new Set();
+
+        globalStateData.rawSignals?.forEach((sig) => {
+          const ts = sig.position?.timestamp;
+          if (ts) {
+            const d = new Date(ts);
+            if (!isNaN(d)) {
+              yearsSet.add(d.getFullYear());
+              monthsSet.add(String(d.getMonth() + 1).padStart(2, "0"));
+            }
+          }
+        });
+
+        // Re-populate Dropdown Filters
+        repopulateFilterOptions("yearFilter", yearsSet, "All Available Years");
+        repopulateFilterOptions(
+          "monthFilter",
+          monthsSet,
+          "All Available Months",
+        );
+
+        // Execute Serialized Background OpenStreetMap Enrichment Tasks
+        if (globalStateData.userLocationProfile?.frequentPlaces) {
+          for (let place of globalStateData.userLocationProfile
+            .frequentPlaces) {
+            const coord = parseCoords(place.placeLocation);
+            if (coord) {
+              const osmEnriched = await fetchOSMData(coord.lat, coord.lng);
+              place.osmResolvedType = osmEnriched.type;
+              place.osmResolvedName = osmEnriched.name;
+            }
+          }
+        }
+
+        // Fire UI Pipeline Update
+        applyDataTransformationFilters();
+      }
+
+      function repopulateFilterOptions(elementId, dataset, wildcardLabel) {
+        const selectEl = document.getElementById(elementId);
+        selectEl.innerHTML = `<option value="ALL">${wildcardLabel}</option>`;
+        Array.from(dataset)
+          .sort()
+          .forEach((val) => {
+            selectEl.innerHTML += `<option value="${val}">${val}</option>`;
+          });
+      }
+
+      // Processing Pipeline: Filters, Proximity Calculation & Drawing
+      function applyDataTransformationFilters() {
+        if (!globalStateData) return;
+
+        // Clear operational map rendering tracks
+        mapLayers.forEach((l) => mapInstance.removeLayer(l));
+        mapLayers = [];
+
+        const activeYear = document.getElementById("yearFilter").value;
+        const activeMonth = document.getElementById("monthFilter").value;
+        const separationRadius = parseFloat(
+          document.getElementById("radiusSlider").value,
+        );
+
+        // 1. Filtering Logic Application
+        const filteredSignals = globalStateData.rawSignals.filter((sig) => {
+          const ts = sig.position?.timestamp;
+          if (!ts) return false;
+          const d = new Date(ts);
+          if (isNaN(d)) return false;
+
+          const matchYear =
+            activeYear === "ALL" || d.getFullYear().toString() === activeYear;
+          const matchMonth =
+            activeMonth === "ALL" ||
+            String(d.getMonth() + 1).padStart(2, "0") === activeMonth;
+          return matchYear && matchMonth;
+        });
+
+        // Update UI Counters
+        document.getElementById("metaSignals").innerText =
+          globalStateData.rawSignals.length;
+        document.getElementById("metaFiltered").innerText =
+          filteredSignals.length;
+
+        // 2. Spatial Matrix Proximity Clustering Implementation
+        const densityCounts = {};
+        if (globalStateData.userLocationProfile?.frequentPlaces) {
+          globalStateData.userLocationProfile.frequentPlaces.forEach((p) => {
+            densityCounts[p.placeId] = 0;
+          });
+        }
+
+        const trackingTrackCoords = [];
+        filteredSignals.forEach((sig) => {
+          const signalCoord = parseCoords(sig.position.LatLng);
+          if (!signalCoord) return;
+
+          trackingTrackCoords.push([signalCoord.lat, signalCoord.lng]);
+
+          // Map out distance to calculate clustering proximity values
+          if (globalStateData.userLocationProfile?.frequentPlaces) {
+            globalStateData.userLocationProfile.frequentPlaces.forEach((p) => {
+              const targetCoord = parseCoords(p.placeLocation);
+              if (targetCoord) {
+                const dist = calculateHaversineDistance(
+                  signalCoord.lat,
+                  signalCoord.lng,
+                  targetCoord.lat,
+                  targetCoord.lng,
+                );
+                if (dist <= separationRadius) {
+                  densityCounts[p.placeId]++;
+                }
+              }
+            });
+          }
+
+          // Render trace point vectors onto Map Canvas
+          const markerNode = L.circleMarker(
+            [signalCoord.lat, signalCoord.lng],
+            {
+              radius: 4,
+              fillColor: "#2563eb",
+              color: "#60a5fa",
+              weight: 1,
+              fillOpacity: 0.7,
+            },
+          )
+            .addTo(mapInstance)
+            .bindPopup(
+              `<b>Raw Telemetry Ping</b><br>Time: ${sig.position.timestamp}<br>Speed: ${sig.position.speedMetersPerSecond} m/s`,
+            );
+          mapLayers.push(markerNode);
+        });
+
+        // Connect lines chronologically if tracking vectors exist
+        if (trackingTrackCoords.length > 1) {
+          const linePath = L.polyline(trackingTrackCoords, {
+            color: "#06b6d4",
+            weight: 2.5,
+            opacity: 0.8,
+          }).addTo(mapInstance);
+          mapLayers.push(linePath);
+          mapInstance.fitBounds(linePath.getBounds(), { padding: [40, 40] });
+        }
+
+        // 3. Render Frequent Anchor Node Markers with Proximity Radial Fences
+        const placesContainer = document.getElementById(
+          "frequentPlacesContainer",
+        );
+        placesContainer.innerHTML = "";
+
+        if (globalStateData.userLocationProfile?.frequentPlaces) {
+          globalStateData.userLocationProfile.frequentPlaces.forEach((p) => {
+            const c = parseCoords(p.placeLocation);
+            if (!c) return;
+
+            // Plot Location Anchor Visuals
+            const anchorPoint = L.circleMarker([c.lat, c.lng], {
+              radius: 9,
+              fillColor: "#10b981",
+              color: "#047857",
+              weight: 2,
+              fillOpacity: 0.9,
+            })
+              .addTo(mapInstance)
+              .bindPopup(
+                `<b>${p.label}</b><br>OSM Infrastructure: ${p.osmResolvedName || "Processing..."}`,
+              );
+            mapLayers.push(anchorPoint);
+
+            // Plot Proximity Fence Boundary Line
+            const radialFence = L.circle([c.lat, c.lng], {
+              radius: separationRadius,
+              color: "#10b981",
+              weight: 1,
+              fillColor: "#34d399",
+              fillOpacity: 0.05,
+              dashArray: "4, 4",
+            }).addTo(mapInstance);
+            mapLayers.push(radialFence);
+
+            // Build UI Container Cards using OSM Resolved Elements
+            placesContainer.innerHTML += `
+                        <div class="p-3 bg-slate-950 border border-slate-800 rounded-lg hover:border-emerald-500 transition">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-xs font-bold text-emerald-400">${p.label}</h3>
+                                <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800/50">${p.osmResolvedType || "Loading Categorization"}</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 font-semibold mt-1">📍 ${p.osmResolvedName || "Querying Location Metadata..."}</p>
+                            <p class="text-[10px] text-slate-500 mt-0.5 font-mono">System Code: ${p.placeId} | Coords: ${p.placeLocation}</p>
+                        </div>
+                    `;
+          });
+        }
+
+        // 4. Update Time Blocking Lists UI
+        renderTimelineBlockUI(activeYear, activeMonth);
+
+        // 5. Redraw Density Distributions Metrics Charts
+        renderDensityChartUI(densityCounts);
+      }
+
+      // Render Method for Contextual Time Block Nodes
+      function renderTimelineBlockUI(yr, mo) {
+        const container = document.getElementById("timelineContainer");
+        container.innerHTML = "";
+
+        const activeSegments =
+          globalStateData.semanticSegments?.filter((seg) => {
+            if (yr === "ALL" && mo === "ALL") return true;
+            const matchVal = seg.startTime.slice(0, 7); // Yields YYYY-MM structure
+            const yearMatch = yr === "ALL" || seg.startTime.startsWith(yr);
+            const monthMatch = mo === "ALL" || seg.startTime.slice(5, 7) === mo;
+            return yearMatch && monthMatch;
+          }) || [];
+
+        if (activeSegments.length === 0) {
+          container.innerHTML = `<p class="text-slate-500 text-xs italic text-center py-4">No segment sequences fit the defined temporal filter array metrics.</p>`;
+          return;
+        }
+
+        activeSegments.forEach((seg) => {
+          const isMoving = (seg.timelinePath?.length || 0) > 1;
+          container.innerHTML += `
+                    <div class="p-2.5 bg-slate-950 border border-slate-800 rounded-lg flex justify-between items-center text-xs">
+                        <div>
+                            <span class="text-[9px] px-1.5 py-0.5 font-bold rounded ${isMoving ? "bg-cyan-950 text-cyan-300 border border-cyan-800/40" : "bg-indigo-950 text-indigo-300 border border-indigo-800/40"}">
+                                ${isMoving ? "🔄 TRANSIT CHAIN" : "🛑 ANCHOR STATIONARY"}
+                            </span>
+                            <div class="text-[10px] text-slate-400 mt-1 font-mono">Trace Elements: ${seg.timelinePath?.length || 0} spatial vectors</div>
+                        </div>
+                        <div class="text-right font-mono font-bold text-slate-300 text-[11px]">
+                            ${seg.startTime.replace("T", " ")}<br><span class="text-slate-500 text-[10px]">to</span> ${seg.endTime.replace("T", " ")}
+                        </div>
+                    </div>
+                `;
+        });
+      }
+
+      // Charting Engine Interface Handler
+      function renderDensityChartUI(countsObj) {
+        const ctx = document.getElementById("proximityChart").getContext("2d");
+        if (chartInstance) chartInstance.destroy();
+
+        const labels = [];
+        const countsData = [];
+
+        if (globalStateData.userLocationProfile?.frequentPlaces) {
+          globalStateData.userLocationProfile.frequentPlaces.forEach((p) => {
+            labels.push(p.label);
+            countsData.push(countsObj[p.placeId] || 0);
+          });
+        }
+
+        chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Pings Within Range Fence",
+                data: countsData,
+                backgroundColor: "rgba(6, 182, 212, 0.4)",
+                borderColor: "rgba(6, 182, 212, 1)",
+                borderWidth: 1.5,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: "#94a3b8", font: { size: 10 } },
+              },
+              y: {
+                grid: { color: "#1e293b" },
+                ticks: { color: "#94a3b8", font: { size: 10 }, precision: 0 },
+              },
+            },
+          },
+        });
+      }
+    </script>
+  </body>
+</html>
